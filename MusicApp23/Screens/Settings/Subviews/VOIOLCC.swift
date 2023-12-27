@@ -8,11 +8,18 @@
 import SwiftUI
 
 struct VOIOLCC: View {
+    
+    // MARK: - Body
     var body: some View {
-        Text(/*@START_MENU_TOKEN@*/"Hello, World!"/*@END_MENU_TOKEN@*/)
+        Image("voio")
+            .resizable()
+            .scaledToFit()
+            .frame(width: 81)
+            .padding(.top, 20)
     }
 }
 
 #Preview {
     VOIOLCC()
+        .preferredColorScheme(.dark)
 }

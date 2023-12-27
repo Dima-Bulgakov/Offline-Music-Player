@@ -8,11 +8,29 @@
 import SwiftUI
 
 struct WelcomeButtonsView: View {
+    
+    // MARK: - Properties
+    @EnvironmentObject var vm: ViewModel
+    
+    // MARK: - Body
     var body: some View {
-        Text(/*@START_MENU_TOKEN@*/"Hello, World!"/*@END_MENU_TOKEN@*/)
+        VStack(spacing: 18) {
+            HStack(spacing: 18) {
+                WelcomButton(image: "filesW", title: "Files") { vm.isFilePresented.toggle() }
+                WelcomButton(image: "cameraW", title: "Camera Roll") {}
+            }
+            HStack(spacing: 18) {
+                WelcomButton(image: "appSharingW", title: "App Sharing") {}
+                WelcomButton(image: "safariW", title: "Safari") {}
+            }
+            WelcomButton(image: "wifiW", title: "Wi-Fi Transfer") {}
+            WelcomButton(image: "pcImportW", title: "PC Import") {}
+        }
     }
 }
 
 #Preview {
     WelcomeButtonsView()
+        .environmentObject(ViewModel())
+        .preferredColorScheme(.dark)
 }

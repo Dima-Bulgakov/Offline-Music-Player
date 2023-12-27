@@ -8,11 +8,22 @@
 import SwiftUI
 
 struct Bunner: View {
+    
+    // MARK: - Body
     var body: some View {
-        Text(/*@START_MENU_TOKEN@*/"Hello, World!"/*@END_MENU_TOKEN@*/)
+        Color.bunner
+            .frame(height: 148)
+            .frame(maxWidth: .infinity)
+            .cornerRadius(16)
+            .padding()
+            .overlay {
+                Text("Get Pro Bunner")
+                    .getBunnerFont()
+            }
     }
 }
 
 #Preview {
     Bunner()
+        .preferredColorScheme(.dark)
 }

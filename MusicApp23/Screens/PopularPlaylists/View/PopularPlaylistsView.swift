@@ -8,11 +8,24 @@
 import SwiftUI
 
 struct PopularPlaylistsView: View {
+    
+    @Environment (\.dismiss) private var dismiss
+    
     var body: some View {
-        Text(/*@START_MENU_TOKEN@*/"Hello, World!"/*@END_MENU_TOKEN@*/)
+        VStack {
+            VStack {
+                PopularPlaylistsList()
+            }
+            .background(Color.bg)
+            .navigationBarBackButtonHidden(true)
+            .navigationTitle("Popular Playlists")
+            .customBarButton(name: "back", width: 40, height: 0, placement: .topBarLeading) { dismiss() }
+        }
     }
 }
 
 #Preview {
     PopularPlaylistsView()
+        .environmentObject(ViewModel())
+        .preferredColorScheme(.dark)
 }

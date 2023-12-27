@@ -8,11 +8,29 @@
 import SwiftUI
 
 struct RecentlyList: View {
+    
+    // MARK: - Properties
+    @EnvironmentObject var vm: ViewModel
+    
+    // MARK: - Body
     var body: some View {
-        Text(/*@START_MENU_TOKEN@*/"Hello, World!"/*@END_MENU_TOKEN@*/)
+        ScrollView {
+            LazyVStack(spacing: 14) {
+                ForEach(vm.songs.prefix(12)) { song in
+                    HStack {
+                        ArtistCellWithDuration(songModel: song)
+                    }
+                    .listRowBackground(Color.bg)
+                }
+                .listRowSeparator(.hidden)
+            }
+        }
+        .listStyle(InsetListStyle())
     }
 }
 
 #Preview {
     RecentlyList()
+        .environmentObject(ViewModel())
+        .preferredColorScheme(.dark)
 }

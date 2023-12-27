@@ -8,11 +8,36 @@
 import SwiftUI
 
 struct SearchBar: View {
+    
+    // MARK: - Propeties
+    @EnvironmentObject var vm: ViewModel
+    let magnifyingglass = Image(systemName: "magnifyingglass")
+    @State var search = ""
+    
+    // MARK: - Body
     var body: some View {
-        Text(/*@START_MENU_TOKEN@*/"Hello, World!"/*@END_MENU_TOKEN@*/)
+        HStack {
+            HStack {
+                TextField("\(magnifyingglass) Search", text: $search)
+                    .multilineTextAlignment(.center)
+                    .accentColor(.accent)
+                    .colorMultiply(.white)
+                    .padding(8)
+                    
+            }
+            .overlay(
+                RoundedRectangle(cornerRadius: 10)
+                    .stroke(Color.accent, lineWidth: 1)
+            )
+            .frame(minHeight: 36, maxHeight: 36)
+        }
+        .padding(.horizontal)
+        .padding(.top)
     }
 }
 
 #Preview {
     SearchBar()
+        .environmentObject(ViewModel())
+        .preferredColorScheme(.dark)
 }

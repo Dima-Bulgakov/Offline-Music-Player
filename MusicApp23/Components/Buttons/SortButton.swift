@@ -8,11 +8,41 @@
 import SwiftUI
 
 struct SortButton: View {
+    
+    // MARK: - Properties
+    @State private var isShowSortMenu = false
+    
+    // MARK: - Body
     var body: some View {
-        Text(/*@START_MENU_TOKEN@*/"Hello, World!"/*@END_MENU_TOKEN@*/)
+        Button {
+            self.isShowSortMenu.toggle()
+        } label: {
+            HStack(spacing: 0) {
+                Image("sort")
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: 17)
+                Text("Sort By")
+                    .shuffleAndSortFont()
+                    .padding(.leading, 8)
+                    .padding(.vertical, 10)
+            }
+            .padding(.horizontal, 20)
+            .frame(maxWidth: .infinity)
+            .overlay(
+                
+                RoundedRectangle(cornerRadius: 20)
+                    .stroke(Color.accent, lineWidth: 1)
+            )
+        }
+        .popover(isPresented: $isShowSortMenu, attachmentAnchor: .point(.bottom), content: {
+            SortMenu()
+        })
+        .frame(maxWidth: .infinity)
     }
 }
 
 #Preview {
     SortButton()
+        .preferredColorScheme(.dark)
 }

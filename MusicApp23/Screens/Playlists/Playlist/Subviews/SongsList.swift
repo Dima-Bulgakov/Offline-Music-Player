@@ -29,4 +29,5 @@ struct SongsList: View {
 #Preview {
     SongsList()
         .environmentObject(ViewModel())
+        .preferredColorScheme(.dark)
 }

@@ -8,11 +8,21 @@
 import SwiftUI
 
 struct ContentView: View {
+
+    // MARK: - Body
     var body: some View {
-        Text(/*@START_MENU_TOKEN@*/"Hello, World!"/*@END_MENU_TOKEN@*/)
+        ZStack(alignment: .bottom) {
+            MainMenu()
+                .zIndex(1)
+            PlayerView()
+                .offset(y: 30)
+                .zIndex(2)
+        }
     }
 }
 
 #Preview {
     ContentView()
+        .environmentObject(ViewModel())
+        .preferredColorScheme(.dark)
 }

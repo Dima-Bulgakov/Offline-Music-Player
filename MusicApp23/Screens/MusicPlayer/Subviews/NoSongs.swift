@@ -8,11 +8,40 @@
 import SwiftUI
 
 struct NoSongs: View {
+    
+    // MARK: - Properties
     var body: some View {
-        Text(/*@START_MENU_TOKEN@*/"Hello, World!"/*@END_MENU_TOKEN@*/)
+        VStack {
+            
+            // MARK: - Image
+            Image("noSongs")
+                .resizable()
+                .scaledToFit()
+                .frame(width: 202, height: 202)
+            
+            // MARK: - Description
+            HStack {
+                VStack {
+                    HStack {
+                        Text("Please")
+                            .importButtonFont()
+                        NavigationLink(destination: WelcomeView()) {
+                            Text("import")
+                                .importLinkFont()
+                        }
+                        Text("music")
+                            .importButtonFont()
+                    }
+                    Text("to starting use the app")
+                        .importButtonFont()
+                }
+                .padding(.top, 25)
+            }
+        }
     }
 }
 
 #Preview {
     NoSongs()
+        .preferredColorScheme(.dark)
 }

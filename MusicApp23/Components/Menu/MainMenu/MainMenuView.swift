@@ -53,4 +53,5 @@ struct MainMenuView: View {
 
 #Preview {
     MainMenuView(selectedView: .constant(1), isMenuVisible: .constant(true))
+        .preferredColorScheme(.dark)
 }

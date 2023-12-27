@@ -33,4 +33,5 @@ struct MenuItem: View {
         .frame(height: 22)
         .padding()
         .background(.white)
+        .preferredColorScheme(.dark)
 }

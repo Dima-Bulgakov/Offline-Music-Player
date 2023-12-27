@@ -8,7 +8,8 @@
 import Foundation
 import RealmSwift
 
-class SongModel: Object, Identifiable {
+// MARK: - Model
+final class SongModel: Object, Identifiable {
     @Persisted(primaryKey: true) var id: ObjectId
     @Persisted var name: String
     @Persisted var data: Data
@@ -20,7 +21,6 @@ class SongModel: Object, Identifiable {
         "id"
     }
 
-    // Добавьте инициализатор без параметров
     convenience override init() {
         self.init(name: "", data: Data())
     }
@@ -34,11 +34,8 @@ class SongModel: Object, Identifiable {
     }
 }
 
-import Foundation
 import AVFoundation
-
-
-// MARK: - Temp Model
+// MARK: - Temporary Model
 struct PlaylistModel: Identifiable {
     let id = UUID()
     let img : String

@@ -8,11 +8,16 @@
 import SwiftUI
 
 struct BottomText: View {
+    
+    // MARK: - Body
     var body: some View {
-        Text(/*@START_MENU_TOKEN@*/"Hello, World!"/*@END_MENU_TOKEN@*/)
+        Text("Please import music \nto starting use the app")
+            .descriptionFont()
+            .padding(.top, 30)
     }
 }
 
 #Preview {
     BottomText()
+        .preferredColorScheme(.dark)
 }

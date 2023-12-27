@@ -75,4 +75,5 @@ struct MainMenu: View {
 #Preview {
     MainMenu()
         .environmentObject(ViewModel())
+        .preferredColorScheme(.dark)
 }

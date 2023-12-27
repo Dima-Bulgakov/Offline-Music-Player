@@ -8,11 +8,26 @@
 import SwiftUI
 
 struct PopularPlaylistsList: View {
+    
+    // MARK: - Properties
+    @EnvironmentObject var vm: ViewModel
+    
+    // MARK: - Body
     var body: some View {
-        Text(/*@START_MENU_TOKEN@*/"Hello, World!"/*@END_MENU_TOKEN@*/)
+        List {
+            ForEach(vm.popularPlaylists) { pl in
+                NavigationLink(destination: Playlist(playlist: pl)) {
+                    HorPlaylistComponents(playlistModel: pl)
+                }
+            }
+            .listRowSeparator(.hidden)
+        }
+        .listStyle(PlainListStyle())
     }
 }
 
 #Preview {
     PopularPlaylistsList()
+        .environmentObject(ViewModel())
+        .preferredColorScheme(.dark)
 }

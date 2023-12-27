@@ -9,7 +9,7 @@ import SwiftUI
 import AVFAudio
 import RealmSwift
 
-class ViewModel: ObservableObject {
+final class ViewModel: ObservableObject {
     
     // MARK: - Properties
     @Published var actionSheetVisible = false
@@ -23,6 +23,9 @@ class ViewModel: ObservableObject {
     @Published var isPlaying = false
     @Published var currentTime: TimeInterval = 0.0
     @Published var totalTime: TimeInterval = 0.0
+    @Published var isShuffle: Bool = false
+    
+    var originalSongsOrder: [SongModel] = []
     
     @ObservedResults(SongModel.self) var songData
     @Published var songs: [SongModel] = []
@@ -30,6 +33,7 @@ class ViewModel: ObservableObject {
     // MARK: - Initializer
     init() {
         songs = Array(songData)
+        originalSongsOrder = songs
     }
     
     // MARK: - Realm Methods
@@ -64,20 +68,6 @@ class ViewModel: ObservableObject {
             print("Error deleting song: \(error.localizedDescription)")
         }
     }
-
-    
-//    func deleteSong(at indices: IndexSet) {
-//        do {
-//            let realm = try Realm()
-//            try realm.write {
-//                let songsToDelete = indices.compactMap { $0 < songs.count ? songs[$0] : nil }
-//                realm.delete(songsToDelete)
-//            }
-//            songs = Array(realm.objects(SongModel.self))
-//        } catch {
-//            print("Error deleting song: \(error.localizedDescription)")
-//        }
-//    }
     
     // MARK: - Player Methods
     func updateProgress() {
@@ -100,12 +90,11 @@ class ViewModel: ObservableObject {
             self.audioPlayer?.prepareToPlay()
             self.audioPlayer?.play()
             isPlaying = true
-            totalTime = audioPlayer?.duration ?? 0.0 // Устанавливаем totalTime
+            totalTime = audioPlayer?.duration ?? 0.0
         } catch {
             print("Error playing audio: \(error.localizedDescription)")
         }
     }
-
     
     func playPause() {
         if isPlaying {
@@ -121,6 +110,54 @@ class ViewModel: ObservableObject {
         self.audioPlayer = nil
     }
     
+    func forward() {
+        guard let audioPlayer = audioPlayer else { return }
+        
+        if let currentIndex = currentSongIndex, currentIndex < songs.count - 1 {
+            currentSongIndex! += 1
+        } else {
+            currentSongIndex = 0
+        }
+        
+        let song = songs[currentSongIndex!]
+        currentSong = song
+        playAudio(data: song.data)
+    }
+    
+    func backward() {
+        guard let audioPlayer = audioPlayer else { return }
+        
+        if let currentIndex = currentSongIndex, currentIndex > 0 {
+            currentSongIndex! -= 1
+        } else {
+            currentSongIndex = songs.count - 1
+        }
+        
+        let song = songs[currentSongIndex!]
+        currentSong = song
+        playAudio(data: song.data)
+    }
+    
+    func shuffleSongs() {
+        if isShuffle {
+            songs = originalSongsOrder
+            currentSongIndex = originalSongsOrder.firstIndex { $0 == currentSong }
+        } else {
+            songs = songs.shuffled()
+            currentSongIndex = 0
+            if let song = songs.first {
+                currentSong = song
+                playAudio(data: song.data)
+            }
+        }
+        isShuffle.toggle()
+    }
+    
+    func reverseOrder() {
+        songs = songs.reversed()
+        currentSongIndex = songs.firstIndex { $0 == currentSong }
+    }
+    
     func durationFormatted(_ duration: TimeInterval) -> String {
         let formatter = DateComponentsFormatter()
         formatter.allowedUnits = [.minute, .second]
@@ -129,7 +166,29 @@ class ViewModel: ObservableObject {
         return formatter.string(from: duration) ?? ""
     }
     
-    // MARK: - Temporary Data
+    // MARK: - Sort Menu Methods
+    func sortSongsByArtist() {
+        songs = songs.sorted { (song1, song2) in
+            return song1.artist?.localizedCaseInsensitiveCompare(song2.artist ?? "") == .orderedAscending
+        }
+    }
+    
+    func sortSongsByTitle() {
+        songs = songs.sorted { (song1, song2) in
+            return song1.name.localizedCaseInsensitiveCompare(song2.name) == .orderedAscending
+        }
+    }
+    
+    func sortSongsByDuration() {
+        songs = songs.sorted { (song1, song2) in
+            guard let duration1 = song1.duration, let duration2 = song2.duration else {
+                return false
+            }
+            return duration1 < duration2
+        }
+    }
+    
+    // MARK: - Temporary Playlists Data
     var myPlaylists: [PlaylistModel] = [
         .init(img: "playlist1", name: "Music for car", count: 32, songs: []),
         .init(img: "playlist2", name: "Music for gym", count: 25, songs: []),
@@ -162,6 +221,3 @@ class ViewModel: ObservableObject {
         .init(img: "playlist13", name: "Rock 80s", count: 8, songs: [])
     ]
 }
-
-
-

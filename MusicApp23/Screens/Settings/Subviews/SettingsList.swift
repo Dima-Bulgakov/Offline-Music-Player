@@ -8,11 +8,22 @@
 import SwiftUI
 
 struct SettingsList: View {
+    
+    // MARK: - Body
     var body: some View {
-        Text(/*@START_MENU_TOKEN@*/"Hello, World!"/*@END_MENU_TOKEN@*/)
+        List {
+            SettingListCell(image: "report", title: "Report Bug")
+            SettingListCell(image: "rate", title: "Rate Us")
+            SettingListCell(image: "share", title: "Share App")
+            SettingListCell(image: "privacy", title: "Privacy Policy")
+            SettingListCell(image: "terms", title: "Terms of Use")
+        }
+        .listStyle(PlainListStyle())
+        .frame(height: 330)
     }
 }
 
 #Preview {
     SettingsList()
+        .preferredColorScheme(.dark)
 }

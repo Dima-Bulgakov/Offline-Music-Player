@@ -5,4 +5,12 @@
 //  Created by Dima on 21.12.2023.
 //
 
-import Foundation
+import SwiftUI
+
+extension View {
+    func customNavigationTitle(title: String) -> some View {
+        self
+            .navigationTitle(title)
+            .navigationBarTitleDisplayMode(.inline)
+    }
+}

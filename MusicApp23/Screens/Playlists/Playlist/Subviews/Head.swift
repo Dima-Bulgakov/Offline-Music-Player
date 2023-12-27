@@ -42,4 +42,5 @@ struct Head: View {
 
 #Preview {
     Head(playlist: PlaylistModel(img: "playlist1", name: "Workout", count: 23, songs: []))
+        .preferredColorScheme(.dark)
 }

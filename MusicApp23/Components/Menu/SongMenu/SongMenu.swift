@@ -8,10 +8,78 @@
 import SwiftUI
 
 struct SongMenu: View {
+    
+    // MARK: - Body
     var body: some View {
-        Text(/*@START_MENU_TOKEN@*/"Hello, World!"/*@END_MENU_TOKEN@*/)
+        VStack(alignment: .leading) {
+            Button {
+                // Add Action
+            } label: {
+                HStack {
+                    Image("favoriteSM")
+                        .resizable()
+                        .aspectRatio(contentMode: .fit)
+                        .frame(width: 18)
+                        .padding(.trailing, 8)
+                        .padding(.vertical, 5)
+                    Text("Add to Favorite")
+                        .songMenuFont()
+                    
+                }
+                .padding(.horizontal, 14)
+            }
+            Divider()
+            Button {
+                // Add Action
+            } label: {
+                HStack {
+                    Image("playlistSM")
+                        .resizable()
+                        .aspectRatio(contentMode: .fit)
+                        .frame(width: 18)
+                        .padding(.trailing, 8)
+                        .padding(.vertical, 5)
+                    Text("Add to Playlist")
+                        .songMenuFont()
+                }
+                .padding(.horizontal, 14)
+            }
+            Divider()
+            Button {
+                // Add Action
+            } label: {
+                HStack {
+                    Image("deleteSM")
+                        .resizable()
+                        .aspectRatio(contentMode: .fit)
+                        .frame(width: 18)
+                        .padding(.trailing, 8)
+                        .padding(.vertical, 5)
+                    Text("Delete")
+                        .songMenuFont()
+                }
+                .padding(.horizontal, 14)
+            }
+        }
+        .frame(width: 175, height: 143)
+        .background(Color.menu)
+        .modifier(ConditionalCompactAdaptation())
     }
 }
+
+struct ConditionalCompactAdaptation: ViewModifier {
+    
+    @Environment(\.horizontalSizeClass) private var horizontalSizeClass
+
+    func body(content: Content) -> some View {
+        if #available(iOS 16.4, *) {
+            return content.presentationCompactAdaptation(.none)
+        } else {
+            return content
+        }
+    }
+}
+
 
 #Preview {
     SongMenu()

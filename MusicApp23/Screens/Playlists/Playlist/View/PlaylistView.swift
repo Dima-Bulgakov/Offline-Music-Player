@@ -7,12 +7,30 @@
 
 import SwiftUI
 
-struct PlaylistView: View {
+struct Playlist: View {
+    
+    // MARK: - Properties
+    var playlist: PlaylistModel
+    @Environment (\.dismiss) private var dismiss
+    
+    // MARK: - Body
     var body: some View {
-        Text(/*@START_MENU_TOKEN@*/"Hello, World!"/*@END_MENU_TOKEN@*/)
+        VStack {
+            
+            // MARK: - Subviews
+            Head(playlist: playlist)
+            SongsList()
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
+        .background(Color.bg)
+        .navigationBarBackButtonHidden(true)
+        .navigationTitle(playlist.name)
+        .customBarButton(name: "back", width: 40, height: 0, placement: .topBarLeading) { dismiss() }
     }
 }
 
 #Preview {
-    PlaylistView()
+    Playlist(playlist: PlaylistModel(img: "playlist1", name: "Workout", count: 23, songs: []))
+        .environmentObject(ViewModel())
+        .preferredColorScheme(.dark)
 }

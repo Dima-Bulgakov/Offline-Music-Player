@@ -8,11 +8,45 @@
 import SwiftUI
 
 struct SettingListCell: View {
+    
+    // MARK: - Properties
+    let image: String
+    let title: String
+    
+    // MARK: - Body
     var body: some View {
-        Text(/*@START_MENU_TOKEN@*/"Hello, World!"/*@END_MENU_TOKEN@*/)
+        VStack {
+            HStack {
+                
+                // MARK: - Image
+                Image(image)
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: 22)
+                    .padding(9)
+                    .background(
+                        Circle()
+                            .foregroundStyle(Color.bunner)
+                    )
+                    .padding(.trailing, 9)
+                
+                // MARK: - Title
+                Text(title)
+                    .nameFont()
+                Spacer()
+                
+                // MARK: - Arrow
+                Image("arrow")
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: 8)
+            }
+        }
+        .background(Color.bg)
     }
 }
 
 #Preview {
-    SettingListCell()
+    SettingListCell(image: "report", title: "Report Bug")
+        .preferredColorScheme(.dark)
 }
