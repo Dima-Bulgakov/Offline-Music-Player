@@ -1,18 +1,18 @@
 //
-//  MenuItem.swift
+//  PopularPlaylistsList.swift
 //  MusicApp23
 //
-//  Created by Dima on 21.12.2023.
+//  Created by Dima on 24.12.2023.
 //
 
 import SwiftUI
 
-struct MenuItem: View {
+struct PopularPlaylistsList: View {
     var body: some View {
         Text(/*@START_MENU_TOKEN@*/"Hello, World!"/*@END_MENU_TOKEN@*/)
     }
 }
 
 #Preview {
-    MenuItem()
+    PopularPlaylistsList()
 }
