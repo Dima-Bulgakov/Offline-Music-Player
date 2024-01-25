@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct ArtistCellForRecently: View {
+struct SongCell: View {
     
     // MARK: - Properties
     let songModel: SongModel
@@ -53,17 +53,11 @@ struct ArtistCellForRecently: View {
             }
             Spacer()
         }
-
-        // MARK: - Turn On the Music by Tapping And Get Current Song
-        .onTapGesture {
-            vm.playAudio(data: songModel.data)
-            vm.setCurrentSong(songModel, index: vm.songs.firstIndex(of: songModel))
-        }
     }
 }
 
 #Preview {
-    ArtistCellForRecently(songModel: SongModel())
+    SongCell(songModel: SongModel())
         .environmentObject(ViewModel())
         .preferredColorScheme(.dark)
 }

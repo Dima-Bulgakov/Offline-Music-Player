@@ -7,23 +7,24 @@
 
 import SwiftUI
 
-struct SearchBar: View {
+struct AllMusicSearchBar: View {
     
-    // MARK: - Propeties
+    // MARK: - Properties
     @EnvironmentObject var vm: ViewModel
     let magnifyingglass = Image(systemName: "magnifyingglass")
-    @State var search = ""
     
     // MARK: - Body
     var body: some View {
         HStack {
             HStack {
-                TextField("\(magnifyingglass) Search", text: $search)
-                    .multilineTextAlignment(.center)
-                    .accentColor(.accent)
-                    .colorMultiply(.white)
-                    .padding(8)
-                    
+                TextField("\(magnifyingglass) Search", text: $vm.search)
+                .multilineTextAlignment(.center)
+                .accentColor(.accent)
+                .colorMultiply(.white)
+                .padding(8)
+                .onChange(of: vm.search, perform: { _ in
+                    vm.searchSongsByArtist()
+                })
             }
             .overlay(
                 RoundedRectangle(cornerRadius: 10)
@@ -36,8 +37,8 @@ struct SearchBar: View {
     }
 }
 
-#Preview {
-    SearchBar()
-        .environmentObject(ViewModel())
-        .preferredColorScheme(.dark)
-}
+//#Preview {
+//    SearchBar()
+//        .environmentObject(ViewModel())
+//        .preferredColorScheme(.dark)
+//}

@@ -1,19 +1,17 @@
 //
-//  ArtistCellWithDuration.swift
+//  SongCellWithDurationEditMode.swift
 //  MusicApp23
 //
-//  Created by Dima on 22.12.2023.
+//  Created by Dima on 23.01.2024.
 //
 
 import SwiftUI
 
-struct ArtistCellWithDuration: View {
+struct SongCellWithDuration: View {
     
-    // MARK: - Properties
     let songModel: SongModel
     @EnvironmentObject var vm: ViewModel
     
-    // MARK: - Body
     var body: some View {
         HStack(spacing: 14) {
             
@@ -60,17 +58,10 @@ struct ArtistCellWithDuration: View {
                     .foregroundStyle(Color.gray)
             }
         }
-        
-        // MARK: - Turn On the Music by Tapping And Get Current Song
-        .onTapGesture {
-            vm.playAudio(data: songModel.data)
-            vm.setCurrentSong(songModel, index: vm.songs.firstIndex(of: songModel))
-        }
     }
 }
 
-#Preview {
-    ArtistCellWithDuration(songModel: SongModel())
-        .environmentObject(ViewModel())
-        .preferredColorScheme(.dark)
-}
+//#Preview {
+//    SongCellWithDurationEditMode()
+//        .environmentObject(ViewModel())
+//}

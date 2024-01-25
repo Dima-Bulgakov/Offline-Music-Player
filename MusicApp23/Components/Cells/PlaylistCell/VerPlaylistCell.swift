@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct VerPlaylistComponents: View {
+struct VerPlaylistCell: View {
     
     // MARK: - Properties
     let playlistModel: PlaylistModel
@@ -17,17 +17,19 @@ struct VerPlaylistComponents: View {
         VStack(alignment: .leading, spacing: 5) {
             ZStack {
                 // MARK: - Background Image
-                Image(playlistModel.img)
+                Image(uiImage: playlistModel.image)
                     .resizable()
-                    .frame(width: 140, height: 100)
                     .scaledToFill()
+                    .frame(width: 140, height: 100)
                     .blur(radius: 3.0, opaque: true)
                     .cornerRadius(10)
+                
                 // MARK: - Main Image
-                Image(playlistModel.img)
+                Image(uiImage: playlistModel.image)
                     .resizable()
-                    .scaledToFit()
+                    .scaledToFill()
                     .frame(width: 80, height: 80, alignment: /*@START_MENU_TOKEN@*/.center/*@END_MENU_TOKEN@*/)
+                    .cornerRadius(10)
             }
             .padding(.bottom, 3)
             // MARK: - Album Name
@@ -44,7 +46,7 @@ struct VerPlaylistComponents: View {
 }
 
 
-#Preview {
-    VerPlaylistComponents(playlistModel: PlaylistModel(img: "playlist1", name: "Car Travel", count: 32, songs: []))
-        .preferredColorScheme(.dark)
-}
+//#Preview {
+//    VerPlaylistComponents(playlistModel: PlaylistModel(img: "playlist1", name: "Car Travel", count: 32, songs: []))
+//        .preferredColorScheme(.dark)
+//}
