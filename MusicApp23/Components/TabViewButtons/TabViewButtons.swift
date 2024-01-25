@@ -7,12 +7,33 @@
 
 import SwiftUI
 
-struct TabViewButtons: View {
-    var body: some View {
-        Text(/*@START_MENU_TOKEN@*/"Hello, World!"/*@END_MENU_TOKEN@*/)
+// MARK: - Struct
+struct OffsetKey: PreferenceKey {
+    static var defaultValue: CGFloat = 0
+    
+    static func reduce(value: inout CGFloat, nextValue: () -> CGFloat) {
+        value = nextValue()
     }
 }
 
-#Preview {
-    TabViewButtons()
+// MARK: - Extension
+extension View {
+    @ViewBuilder
+    func offsetX(completion: @escaping (CGFloat) -> ()) -> some View {
+        self
+            .overlay {
+                GeometryReader { proxy in
+                    let minX = proxy.frame(in: .global).minX
+                    
+                    Color.clear
+                        .preference(key: OffsetKey.self, value: minX)
+                        .onPreferenceChange(OffsetKey.self) { value in
+                            completion(value)
+                        }
+                }
+            }
+    }
 }
+
+
+

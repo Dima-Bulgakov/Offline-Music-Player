@@ -11,6 +11,9 @@ struct Possibilities: View {
     
     // MARK: - Properties
     @EnvironmentObject var vm: ViewModel
+    @EnvironmentObject var importManager: VMImportManager
+    
+    /// Model For Possibilities
     struct Possibility: Hashable, Identifiable {
         let id = UUID()
         var imageName: String
@@ -18,10 +21,10 @@ struct Possibilities: View {
     
     let possibilities: [Possibility] = [
         Possibility(imageName: "files"),
+        Possibility(imageName: "camera"),
         Possibility(imageName: "wifi"),
         Possibility(imageName: "pcImport"),
         Possibility(imageName: "bySharing"),
-        Possibility(imageName: "camera"),
         Possibility(imageName: "safari")
     ]
     
@@ -51,7 +54,9 @@ struct Possibilities: View {
                         Button(action: {
                             switch item.imageName {
                             case "files":
-                                vm.isFilePresented.toggle()
+                                importManager.isFilesPresented.toggle()
+                            case "camera":
+                                importManager.isPhotoPickerPresented.toggle()
                             default:
                                 break
                             }
@@ -74,16 +79,16 @@ struct Possibilities: View {
         }
         .padding(.top, 20)
         
-        // MARK: - Files Open
-        .sheet(isPresented: self.$vm.isFilePresented) {
-            ImportFileManager(songs: $vm.songs, file: $vm.selectedDocument, fileName: $vm.selectedDocumentName, vm: vm)
+        // MARK: - Import Sheets
+        /// Sheet For Import Files
+        .sheet(isPresented: self.$importManager.isFilesPresented) {
+            ImportFileManager(songs: $vm.allSongs, file: $importManager.selectedDocument, fileName: $importManager.selectedDocumentName, vm: vm)
         }
-        .confirmationDialog("Выберите тип", isPresented: $vm.actionSheetVisible) {
-            Button("MP3 файл") {
-                vm.selectedDocument = nil
-                vm.selectedDocumentName = nil
-                vm.isFilePresented.toggle()
-            }
+        /// Sheet For Import Camera's Files
+        .sheet(isPresented: $importManager.isPhotoPickerPresented) {
+            ImportCameraManager(audioPlayer: $vm.audioPlayer, vm: vm, onAudioLoaded: { songName in
+                vm.addSong(name: songName, data: Data(), artist: nil, coverImageData: nil, duration: nil)
+            })
         }
     }
 }
@@ -91,5 +96,6 @@ struct Possibilities: View {
 #Preview {
     Possibilities()
         .environmentObject(ViewModel())
+        .environmentObject(VMImportManager())
         .preferredColorScheme(.dark)
 }

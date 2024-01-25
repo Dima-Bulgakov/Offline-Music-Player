@@ -7,6 +7,8 @@
 
 import Foundation
 import RealmSwift
+import AVFoundation
+import UIKit
 
 // MARK: - Model
 final class SongModel: Object, Identifiable {
@@ -16,6 +18,8 @@ final class SongModel: Object, Identifiable {
     @Persisted var artist: String?
     @Persisted var coverImageData: Data?
     @Persisted var duration: TimeInterval?
+    
+    var isSelected: Bool = false
     
     override class func primaryKey() -> String? {
         "id"
@@ -34,41 +38,52 @@ final class SongModel: Object, Identifiable {
     }
 }
 
-import AVFoundation
 // MARK: - Temporary Model
 struct PlaylistModel: Identifiable {
     let id = UUID()
-    let img : String
-    let name : String
-    let count : Int
-    var songs: [TrackModel]
-}
-
-struct TrackModel: Identifiable {
-    let id = UUID()
-    let img: String
-    let name: String
-    let artist: String
-    let songFile: String
-    var duration: TimeInterval?
-
-    init(img: String, name: String, artist: String, songFile: String) {
-        self.img = img
-        self.name = name
-        self.artist = artist
-        self.songFile = songFile
-        self.duration = loadDuration()
-    }
-
-    func loadDuration() -> TimeInterval? {
-        guard let sound = Bundle.main.path(forResource: songFile, ofType: "mp3") else {
-            return nil
-        }
-
-        let asset = AVURLAsset(url: URL(fileURLWithPath: sound))
-        let durationInSeconds = CMTimeGetSeconds(asset.duration)
-        return durationInSeconds.isFinite ? durationInSeconds : nil
+    var name: String
+    var image: UIImage
+    var isSelected: Bool = false
+    var songs: [SongModel]
+    var numberOfListens: Int = 0
+    
+    var count: Int {
+        return songs.count
     }
 }
+//struct PlaylistModel: Identifiable {
+//    let id = UUID()
+//    var img : String?
+//    var name : String
+//    let count : Int
+//    var songs: [SongModel]
+//}
+
+//struct TrackModel: Identifiable {
+//    let id = UUID()
+//    let img: String
+//    let name: String
+//    let artist: String
+//    let songFile: String
+//    var duration: TimeInterval?
+//
+//    init(img: String, name: String, artist: String, songFile: String) {
+//        self.img = img
+//        self.name = name
+//        self.artist = artist
+//        self.songFile = songFile
+//        self.duration = loadDuration()
+//    }
+//
+//    func loadDuration() -> TimeInterval? {
+//        guard let sound = Bundle.main.path(forResource: songFile, ofType: "mp3") else {
+//            return nil
+//        }
+//
+//        let asset = AVURLAsset(url: URL(fileURLWithPath: sound))
+//        let durationInSeconds = CMTimeGetSeconds(asset.duration)
+//        return durationInSeconds.isFinite ? durationInSeconds : nil
+//    }
+//}
 
 

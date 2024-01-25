@@ -21,7 +21,7 @@ extension Text {
     func titleFont() -> some View {
         self
             .foregroundStyle(Color.primaryFont)
-            .font(.custom("SFProDisplay-Regular", size: 22))
+            .font(.custom("SFProDisplay-Regular", size: 20))
             .lineLimit(1)
             .padding(.bottom, 5)
     }

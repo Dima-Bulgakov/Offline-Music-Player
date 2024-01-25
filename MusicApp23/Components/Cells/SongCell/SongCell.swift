@@ -11,7 +11,6 @@ struct SongCell: View {
     
     // MARK: - Properties
     let songModel: SongModel
-    @EnvironmentObject var vm: ViewModel
     
     // MARK: - Body
     var body: some View {

@@ -7,12 +7,12 @@
 
 import SwiftUI
 
+// MARK: - Import`s Properties
 final class VMImportManager: ObservableObject {
     
-    // MARK: - Properties    
     @Published var isPhotoPickerPresented = false
-    @Published var actionSheetVisible = false
-    @Published var selectedDocument: Data?
-    @Published var selectedDocumentName: String?
     @Published var isFilesPresented = false
+    
+    @Published var selectedDocumentName: String?
+    @Published var selectedDocument: Data?
 }

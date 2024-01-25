@@ -11,32 +11,61 @@ struct MusicList: View {
     
     // MARK: - Properties
     @EnvironmentObject var vm: ViewModel
-    @State var selectedRow = Set<UUID>()
-    @State private var editMode: EditMode = .inactive
     
     // MARK: - Body
     var body: some View {
-        List(selection: $selectedRow) {
-            ForEach(vm.songs) { song in
-                HStack {
-                    ArtistCellWithDuration(songModel: song)
+        VStack {
+            
+            // MARK: List Of All Songs
+            List {
+                ForEach(vm.allSongs) { song in
+                    if vm.editModeAllMusic {
+                        SongCellWithDurationAndEditMode(songModel: song) {
+                            vm.isSelectedSongInArrays(model: song, playlist: &vm.allSongs)
+                        }
+                    } else {
+                        SongCellWithDuration(songModel: song)
+                            .onTapGesture {
+                                vm.playAudio(data: song.data, playlist: vm.allSongs)
+                                vm.setCurrentSong(song, index: vm.allSongs.firstIndex(of: song))
+                            }
+                    }
                 }
-                .listRowBackground(Color.bg)
-                
+                .onDelete(perform: vm.deleteSong)
+                .listRowSeparator(.hidden)
             }
-//            .onDelete(perform: vm.deleteSong)
-            .listRowSeparator(.hidden)
-        }
-        .listStyle(PlainListStyle())
-        .toolbar {
-            ToolbarItem(placement: .topBarTrailing) {
-                EditButton()
-                    .foregroundColor(Color.accent)
+            .listStyle(.plain)
+            .padding(.bottom, vm.editModeAllMusic ? 0 : 130)
+            
+            // MARK: Bottom Buttons For Edit Mode
+            if vm.editModeAllMusic  {
+                HStack {
+                    ButtonForEditMode(name: "selectAll", width: 100) {
+                        vm.selectAllSongs()
+                    }
+                    Spacer()
+                    ButtonForEditMode(name: "addTo", width: 80) {
+                        vm.isShowChoosePlaylistView = true
+                        vm.selectedSongs = vm.allSongs.filter { $0.isSelected }
+                    }
+                    .sheet(isPresented: $vm.isShowChoosePlaylistView) {
+                        ChoosePlaylistView()
+                            .onDisappear {
+                                vm.resetPlaylistSelection()
+                            }
+                    }
+                    Spacer()
+                    ButtonForEditMode(name: "delete", width: 75) {
+                        
+                    }
+                }
+                .padding(.horizontal, 25)
+                .padding(.top)
             }
         }
-        .environment(\.editMode, $editMode)
     }
 }
+
 
 #Preview {
     MusicList()

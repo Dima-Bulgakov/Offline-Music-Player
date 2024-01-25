@@ -11,13 +11,14 @@ struct WelcomeButtonsView: View {
     
     // MARK: - Properties
     @EnvironmentObject var vm: ViewModel
+    @EnvironmentObject var importManager: VMImportManager
     
     // MARK: - Body
     var body: some View {
         VStack(spacing: 18) {
             HStack(spacing: 18) {
-                WelcomButton(image: "filesW", title: "Files") { vm.isFilePresented.toggle() }
-                WelcomButton(image: "cameraW", title: "Camera Roll") {}
+                WelcomButton(image: "filesW", title: "Files") { importManager.isFilesPresented.toggle() }
+                WelcomButton(image: "cameraW", title: "Camera Roll") { importManager.isPhotoPickerPresented.toggle() }
             }
             HStack(spacing: 18) {
                 WelcomButton(image: "appSharingW", title: "App Sharing") {}
@@ -32,5 +33,6 @@ struct WelcomeButtonsView: View {
 #Preview {
     WelcomeButtonsView()
         .environmentObject(ViewModel())
+        .environmentObject(VMImportManager())
         .preferredColorScheme(.dark)
 }

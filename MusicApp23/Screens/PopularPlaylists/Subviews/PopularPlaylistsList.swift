@@ -15,9 +15,12 @@ struct PopularPlaylistsList: View {
     // MARK: - Body
     var body: some View {
         List {
-            ForEach(vm.popularPlaylists) { pl in
-                NavigationLink(destination: Playlist(playlist: pl)) {
-                    HorPlaylistComponents(playlistModel: pl)
+            ForEach(vm.popularPlaylists) { playlist in
+                NavigationLink(destination: PlaylistView(playlist: playlist)) {
+                    HorPlaylistCell(playlistModel: playlist)
+                        .onAppear {
+                            vm.playlistListens(playlist: playlist)
+                        }
                 }
             }
             .listRowSeparator(.hidden)

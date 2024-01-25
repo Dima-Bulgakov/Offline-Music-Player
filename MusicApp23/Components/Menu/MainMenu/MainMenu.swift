@@ -30,6 +30,7 @@ struct MainMenu: View {
                     EmptyView()
                 }
             }
+            .background(Color.bg)
             
             // MARK: - Menu Button
             .toolbar {
@@ -44,36 +45,37 @@ struct MainMenu: View {
                     }
                 }
             }
-            .background(Color.bg)
-        }
-        
-        // MARK: - List of Screens in Menu
-        .overlay {
-            Group {
-                if isMenuVisible {
-                    GeometryReader(content: { _ in
-                        withAnimation {
-                            MainMenuView(selectedView: $selectedView, isMenuVisible: $isMenuVisible)
-                                .offset(x: 20, y: 45)
-                        }
-                    }).background(
-                        Color.black
-                            .opacity(0.3)
-                            .ignoresSafeArea()
-                            .onTapGesture {
-                                withAnimation {
-                                    isMenuVisible.toggle()
-                                }
+            .overlay {
+                Group {
+                    if isMenuVisible {
+                        GeometryReader { _ in
+                            withAnimation {
+                                MainMenuView(selectedView: $selectedView, isMenuVisible: $isMenuVisible)
+                                    .offset(x: 20, y: 45)
                             }
-                    )
+                        }
+                        .background(
+                            Color.black
+                                .opacity(0.3)
+                                .ignoresSafeArea()
+                                .onTapGesture {
+                                    withAnimation {
+                                        isMenuVisible.toggle()
+                                    }
+                                }
+                        )
+                    }
                 }
             }
         }
     }
 }
 
+
 #Preview {
-    MainMenu()
+    ContentView()
         .environmentObject(ViewModel())
+        .environmentObject(VMImportManager())
+
         .preferredColorScheme(.dark)
 }

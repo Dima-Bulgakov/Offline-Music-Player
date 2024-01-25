@@ -9,6 +9,7 @@ import SwiftUI
 
 struct WelcomeView: View {
     
+    // MARK: - Properties
     @Environment (\.dismiss) private var dismiss
     
     // MARK: - Body

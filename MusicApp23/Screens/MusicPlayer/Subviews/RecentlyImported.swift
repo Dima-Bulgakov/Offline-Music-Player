@@ -39,17 +39,21 @@ struct RecentlyImported: View {
             ScrollView(.horizontal, showsIndicators: false) {
                 
                 LazyHGrid(rows: numberColumns, spacing: 20) {
-                    ForEach(vm.songs.prefix(12)) { song in
+                    ForEach(vm.recentlyImported) { song in
                         
-                        ArtistCellForRecently(songModel: song)
-                        .frame(width: 210, alignment: .leading)
+                        SongCell(songModel: song)
+                            .onTapGesture {
+                                vm.playAudio(data: song.data, playlist: vm.recentlyImported)
+                                vm.setCurrentSong(song, index: vm.recentlyImported.firstIndex(of: song))
+                            }
+                            .frame(width: 210, alignment: .leading)
                     }
                 }
                 .offset(x: 16)
             }
             .frame(height: 130)
         }
-        .padding(.top)
+        .padding(.vertical)
     }
 }
 

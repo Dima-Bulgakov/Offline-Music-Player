@@ -9,31 +9,62 @@ import SwiftUI
 import AVFAudio
 import RealmSwift
 
-final class ViewModel: ObservableObject {
+
+final class ViewModel: NSObject, ObservableObject {
     
     // MARK: - Properties
-    @Published var actionSheetVisible = false
-    @Published var selectedDocument: Data?
-    @Published var selectedDocumentName: String?
-    @Published var isFilePresented = false
+    /// Edit Mode
+    @Published var editModeFavorite: Bool = false
+    @Published var editModeAllMusic: Bool = false
+    @Published var editModeInPlaylist: Bool = false
+    @Published var editModePlaylists: Bool = false
+    @Published var isPlayerPresented: Bool = true
     
+    /// Player
     @Published var audioPlayer: AVAudioPlayer?
+    @Published var isPlaying = false
+    @Published var isShuffle: Bool = false
     @Published var currentSong: SongModel? = nil
     @Published var currentSongIndex: Int? = nil
-    @Published var isPlaying = false
     @Published var currentTime: TimeInterval = 0.0
     @Published var totalTime: TimeInterval = 0.0
-    @Published var isShuffle: Bool = false
+    @Published var isRepeat: Bool = false
     
-    var originalSongsOrder: [SongModel] = []
+    /// Searching
+    @Published var searchAllMusic = ""
+    @Published var searchRecently = ""
     
+    /// DataBase
     @ObservedResults(SongModel.self) var songData
-    @Published var songs: [SongModel] = []
+    @Published var allSongs: [SongModel] = [] {
+        didSet {
+            recentlyImportedUpdate()
+        }
+    }
+    @Published var originalSongsOrder: [SongModel] = []
+    @Published var originalSongsOrderRecently: [SongModel] = []
+    @Published var favoriteSongs: [SongModel] = []
+    @Published var recentlyImported: [SongModel] = []
+    @Published var popularPlaylists: [PlaylistModel] = []
+    @Published var allPlaylists: [PlaylistModel] = [] {
+        didSet {
+            updatePopularPlaylists()
+        }
+    }
+    
+    /// Create Playlists And Add Songs To Playlists
+    @Published var selectedSongs: [SongModel] = []
+    @Published var currentPlaylist: [SongModel] = []
+    @Published var isShowAddToPlaylistView = false
+    @Published var isShowChoosePlaylistView = false
     
     // MARK: - Initializer
-    init() {
-        songs = Array(songData)
-        originalSongsOrder = songs
+    override init() {
+        super.init()
+        allSongs = Array(songData)
+        originalSongsOrder = allSongs
+        originalSongsOrderRecently = recentlyImported
+        popularPlaylists = allPlaylists
     }
     
     // MARK: - Realm Methods
@@ -49,7 +80,7 @@ final class ViewModel: ObservableObject {
                 song.data = data
                 song.duration = duration
                 realm.add(song)
-                songs.append(song)
+                allSongs.append(song)
             }
         } catch {
             print("Error adding song: \(error.localizedDescription)")
@@ -60,164 +91,187 @@ final class ViewModel: ObservableObject {
         do {
             let realm = try Realm()
             try realm.write {
-                let songsToDelete = indices.compactMap { $0 < songs.count ? songs[$0] : nil }
+                let songsToDelete = indices.compactMap { $0 < allSongs.count ? allSongs[$0] : nil }
+                
+                // Избегаем использования удаленных объектов
+                for song in songsToDelete {
+                    if let index = allSongs.firstIndex(of: song) {
+                        allSongs.remove(at: index)
+                    }
+                }
+                
                 realm.delete(songsToDelete)
-                songs = Array(realm.objects(SongModel.self))
+                
+                // Очищаем currentSong и currentSongIndex, если они указывают на удаленную песню
+                if let currentSong = currentSong, let index = allSongs.firstIndex(of: currentSong), songsToDelete.contains(currentSong) {
+                    self.currentSong = nil
+                    self.currentSongIndex = nil
+                }
             }
         } catch {
             print("Error deleting song: \(error.localizedDescription)")
         }
     }
+//    func deleteSong(at indices: IndexSet) {
+//        do {
+//            let realm = try Realm()
+//            try realm.write {
+//                let songsToDelete = indices.compactMap { $0 < allSongs.count ? allSongs[$0] : nil }
+//                realm.delete(songsToDelete)
+//                allSongs = Array(realm.objects(SongModel.self))
+//            }
+//        } catch {
+//            print("Error deleting song: \(error.localizedDescription)")
+//        }
+//    }
     
-    // MARK: - Player Methods
-    func updateProgress() {
-        guard let player = audioPlayer else { return }
-        currentTime = player.currentTime
-    }
-    
-    func seekAudio(to time: TimeInterval) {
-        audioPlayer?.currentTime = time
-    }
-    
-    func setCurrentSong(_ song: SongModel?, index: Int?) {
-        currentSong = song
-        currentSongIndex = index
-    }
-    
-    func playAudio(data: Data) {
-        do {
-            self.audioPlayer = try AVAudioPlayer(data: data)
-            self.audioPlayer?.prepareToPlay()
-            self.audioPlayer?.play()
-            isPlaying = true
-            totalTime = audioPlayer?.duration ?? 0.0
-        } catch {
-            print("Error playing audio: \(error.localizedDescription)")
+    // TODO: Add Realm To This Method
+    func addToFavorites() {
+        guard let currentSong = currentSong else { return }
+        if !favoriteSongs.contains(currentSong) {
+            favoriteSongs.append(currentSong)
         }
     }
     
-    func playPause() {
-        if isPlaying {
-            self.audioPlayer?.pause()
-        } else {
-            self.audioPlayer?.play()
-        }
-        isPlaying.toggle()
-    }
-    
-    func stopAudio() {
-        self.audioPlayer?.stop()
-        self.audioPlayer = nil
-    }
-    
-    func forward() {
-        guard let audioPlayer = audioPlayer else { return }
-        
-        if let currentIndex = currentSongIndex, currentIndex < songs.count - 1 {
-            currentSongIndex! += 1
-        } else {
-            currentSongIndex = 0
+    // MARK: - Searching Method
+    func searchSongsByArtist() {
+        guard !searchAllMusic.isEmpty else {
+            allSongs = originalSongsOrder
+            return
         }
         
-        let song = songs[currentSongIndex!]
-        currentSong = song
-        playAudio(data: song.data)
-    }
-    
-    func backward() {
-        guard let audioPlayer = audioPlayer else { return }
-        
-        if let currentIndex = currentSongIndex, currentIndex > 0 {
-            currentSongIndex! -= 1
-        } else {
-            currentSongIndex = songs.count - 1
-        }
-        
-        let song = songs[currentSongIndex!]
-        currentSong = song
-        playAudio(data: song.data)
-    }
-    
-    func shuffleSongs() {
-        if isShuffle {
-            songs = originalSongsOrder
-            currentSongIndex = originalSongsOrder.firstIndex { $0 == currentSong }
-        } else {
-            songs = songs.shuffled()
-            currentSongIndex = 0
-            if let song = songs.first {
-                currentSong = song
-                playAudio(data: song.data)
-            }
-        }
-        isShuffle.toggle()
-    }
-    
-    func reverseOrder() {
-        songs = songs.reversed()
-        currentSongIndex = songs.firstIndex { $0 == currentSong }
-    }
-    
-    func durationFormatted(_ duration: TimeInterval) -> String {
-        let formatter = DateComponentsFormatter()
-        formatter.allowedUnits = [.minute, .second]
-        formatter.unitsStyle = .positional
-        formatter.zeroFormattingBehavior = .pad
-        return formatter.string(from: duration) ?? ""
-    }
-    
-    // MARK: - Sort Menu Methods
-    func sortSongsByArtist() {
-        songs = songs.sorted { (song1, song2) in
-            return song1.artist?.localizedCaseInsensitiveCompare(song2.artist ?? "") == .orderedAscending
-        }
-    }
-    
-    func sortSongsByTitle() {
-        songs = songs.sorted { (song1, song2) in
-            return song1.name.localizedCaseInsensitiveCompare(song2.name) == .orderedAscending
-        }
-    }
-    
-    func sortSongsByDuration() {
-        songs = songs.sorted { (song1, song2) in
-            guard let duration1 = song1.duration, let duration2 = song2.duration else {
+        allSongs = originalSongsOrder.filter { song in
+            if let artist = song.artist {
+                return artist.localizedCaseInsensitiveContains(searchAllMusic)
+            } else {
                 return false
             }
-            return duration1 < duration2
         }
     }
     
-    // MARK: - Temporary Playlists Data
-    var myPlaylists: [PlaylistModel] = [
-        .init(img: "playlist1", name: "Music for car", count: 32, songs: []),
-        .init(img: "playlist2", name: "Music for gym", count: 25, songs: []),
-        .init(img: "playlist3", name: "Music for walking", count: 26, songs: []),
-        .init(img: "playlist4", name: "Music for sad", count: 4, songs: []),
-        .init(img: "playlist5", name: "Workout", count: 8, songs: []),
-        .init(img: "playlist6", name: "Relax", count: 8, songs: []),
-        .init(img: "playlist7", name: "Camping mood", count: 32, songs: []),
-        .init(img: "playlist8", name: "New Year", count: 25, songs: []),
-        .init(img: "playlist9", name: "Deep Calm", count: 26, songs: []),
-        .init(img: "playlist10", name: "Electronic", count: 8, songs: []),
-        .init(img: "playlist11", name: "Meditation", count: 8, songs: []),
-        .init(img: "playlist12", name: "Classic", count: 8, songs: []),
-        .init(img: "playlist13", name: "Rock 80s", count: 8, songs: [])
-    ]
+    func searchSongsByArtistRecently() {
+        guard !searchRecently.isEmpty else {
+            recentlyImported = originalSongsOrderRecently
+            return
+        }
+        
+        recentlyImported = originalSongsOrderRecently.filter { song in
+            if let artist = song.artist {
+                return artist.localizedCaseInsensitiveContains(searchRecently)
+            } else {
+                return false
+            }
+        }
+    }
     
-    var favoritePlaylists: [PlaylistModel] = [
-        .init(img: "playlist3", name: "Music for walking", count: 25, songs: []),
-        .init(img: "playlist5", name: "Workout", count: 8, songs: []),
-        .init(img: "playlist7", name: "Camping mood", count: 8, songs: []),
-        .init(img: "playlist9", name: "Deep Calm", count: 8, songs: []),
-        .init(img: "playlist12", name: "Classic", count: 8, songs: [])
-    ]
+
+
+    // MARK: - Playlist Methods
+    func isSelectedPlaylist(playlist: PlaylistModel) {
+        if let index = allPlaylists.firstIndex(where: { $0.id == playlist.id }) {
+            var newTask = playlist
+            newTask.isSelected.toggle()
+            allPlaylists[index] = newTask
+        }
+    }
+ 
+    func resetPlaylistSelection() {
+        for index in allPlaylists.indices {
+            allPlaylists[index].isSelected = false
+        }
+    }
     
-    var popularPlaylists: [PlaylistModel] = [
-        .init(img: "playlist6", name: "Relax", count: 8, songs: []),
-        .init(img: "playlist8", name: "New Year", count: 25, songs: []),
-        .init(img: "playlist10", name: "Electronic", count: 8, songs: []),
-        .init(img: "playlist11", name: "Meditation", count: 8, songs: []),
-        .init(img: "playlist13", name: "Rock 80s", count: 8, songs: [])
-    ]
+    func selectAllPlaylists() {
+        let allSelected = allPlaylists.allSatisfy { $0.isSelected }
+        
+        for index in allPlaylists.indices {
+            allPlaylists[index].isSelected = !allSelected
+        }
+    }
+    
+    func deleteSelectedPlaylists() {
+        allPlaylists.removeAll { $0.isSelected }
+    }
+    
+    // MARK: - Into Playlist Methods
+    func selectSongsInPlaylist(model: PlaylistModel) {
+            let allSelected = model.songs.allSatisfy { $0.isSelected }
+
+            for index in model.songs.indices {
+                model.songs[index].isSelected = !allSelected
+            }
+        }
+    func deleteSelectedSongsFromPlaylist(model: PlaylistModel) {
+        let selectedIndices = model.songs.indices.filter { model.songs[$0].isSelected }
+        deleteSongsFromPlaylist(at: IndexSet(selectedIndices), playlist: model)
+    }
+    func deleteSongsInPlaylist(at offsets: IndexSet, model: PlaylistModel) {
+        // Вызываем метод в вашей ViewModel для удаления песен по индексам
+        deleteSongsFromPlaylist(at: offsets, playlist: model)
+    }
+    
+    // MARK: - Songs Methods
+    func addSelectedSongsToPlaylists() {
+        let selectedPlaylists = allPlaylists.filter { $0.isSelected }
+        
+        for playlist in selectedPlaylists {
+            var updatedPlaylist = playlist
+            
+            if let currentSong = currentSong, selectedSongs.isEmpty {
+                updatedPlaylist.songs.append(currentSong)
+            }
+            
+            for song in selectedSongs {
+                if !updatedPlaylist.songs.contains(where: { $0.id == song.id }) {
+                    updatedPlaylist.songs.append(song)
+                }
+            }
+            
+            if let index = allPlaylists.firstIndex(where: { $0.id == playlist.id }) {
+                allPlaylists[index] = updatedPlaylist
+            }
+        }
+        selectedSongs.removeAll()
+    }
+    
+    func deleteSongsFromPlaylist(at indices: IndexSet, playlist: PlaylistModel) {
+        guard let playlistIndex = allPlaylists.firstIndex(where: { $0.id == playlist.id }) else { return }
+        allPlaylists[playlistIndex].songs.remove(atOffsets: indices)
+    }
+    
+    func isSelectedSongInArrays(model: SongModel, playlist: inout [SongModel]) {
+        if let index = playlist.firstIndex(where: { $0.id == model.id }) {
+            let newTask = model
+            newTask.isSelected.toggle()
+            playlist[index] = newTask
+        }
+    }
+    
+    func isSelectedSongInPlaylists(song: SongModel) {
+        if let index = allSongs.firstIndex(where: { $0.id == song.id }) {
+            let newTask = song
+            newTask.isSelected.toggle()
+            allSongs[index] = newTask
+        }
+    }
+    
+    func selectAllSongs() {
+        let allSelected = allSongs.allSatisfy { $0.isSelected }
+        
+        for index in allSongs.indices {
+            allSongs[index].isSelected = !allSelected
+        }
+    }
+    
+    func unselectSongs() {
+        for index in allSongs.indices {
+            allSongs[index].isSelected = false
+        }
+    }
+    
+    func deleteSelectedSongsFromFavorites() {
+        favoriteSongs.removeAll { $0.isSelected }
+    } 
 }
+
+

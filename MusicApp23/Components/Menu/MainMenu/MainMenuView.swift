@@ -17,25 +17,25 @@ struct MainMenuView: View {
     var body: some View {
         GeometryReader { geometry in
             VStack(alignment: .leading) {
-                MenuItem(image: "home", title: "Home")
+                MenuItem(image: "home", title: "Home", isSelected: selectedView == 1)
                     .onTapGesture {
                         selectedView = 1
                         isMenuVisible.toggle()
                     }
                 Divider()
-                MenuItem(image: "myMusic", title: "My Music")
+                MenuItem(image: "myMusic", title: "My Music", isSelected: selectedView == 2)
                     .onTapGesture {
                         selectedView = 2
                         isMenuVisible.toggle()
                     }
                 Divider()
-                MenuItem(image: "playlists", title: "Playlists")
+                MenuItem(image: "playlists", title: "Playlists", isSelected: selectedView == 3)
                     .onTapGesture {
                         selectedView = 3
                         isMenuVisible.toggle()
                     }
                 Divider()
-                MenuItem(image: "settings", title: "Settings")
+                MenuItem(image: "settings", title: "Settings", isSelected: selectedView == 4)
                     .onTapGesture {
                         selectedView = 4
                         isMenuVisible.toggle()

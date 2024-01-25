@@ -8,11 +8,26 @@
 import SwiftUI
 
 struct AddAllMusic: View {
+    
+    // MARK: - Properties
+    @EnvironmentObject var vm: ViewModel
+    
+    // MARK: - Body
     var body: some View {
-        Text(/*@START_MENU_TOKEN@*/"Hello, World!"/*@END_MENU_TOKEN@*/)
+        List {
+            ForEach(vm.allSongs) { song in
+                AddMusicItem(songModel: song) {
+                    vm.isSelectedSongInArrays(model: song, playlist: &vm.allSongs)
+                }
+            }
+            .listRowSeparator(.hidden)
+        }
+        .listStyle(PlainListStyle())
     }
 }
 
 #Preview {
     AddAllMusic()
+        .environmentObject(ViewModel())
+        .preferredColorScheme(.dark)
 }

@@ -17,12 +17,12 @@ struct AllMusicSearchBar: View {
     var body: some View {
         HStack {
             HStack {
-                TextField("\(magnifyingglass) Search", text: $vm.search)
+                TextField("\(magnifyingglass) Search", text: $vm.searchAllMusic)
                 .multilineTextAlignment(.center)
                 .accentColor(.accent)
                 .colorMultiply(.white)
                 .padding(8)
-                .onChange(of: vm.search, perform: { _ in
+                .onChange(of: vm.searchAllMusic, perform: { _ in
                     vm.searchSongsByArtist()
                 })
             }

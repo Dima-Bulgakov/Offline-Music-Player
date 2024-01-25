@@ -49,7 +49,7 @@ struct SortMenu: View {
             }
             Divider()
             Button {
-                // Add Action
+                vm.sortSongsByDate()
             } label: {
                 HStack {
                     Image("date")

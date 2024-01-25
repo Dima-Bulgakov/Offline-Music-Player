@@ -19,7 +19,7 @@ struct PopularPlaylists: View {
     // MARK: - Body
     var body: some View {
         VStack(spacing: 0) {
-            HStack(alignment: .bottom) {
+            HStack(alignment: .center) {
                 
                 // MARK: - Title
                 Text("Popular Playlists")
@@ -37,18 +37,19 @@ struct PopularPlaylists: View {
             // MARK: - Playlists
             ScrollView(.horizontal, showsIndicators: false) {
                 LazyHGrid(rows: numberColumns, spacing: 12) {
-                    ForEach(vm.popularPlaylists) { pl in
-                        NavigationLink(destination: Playlist(playlist: pl)) {
-                            VerPlaylistComponents(playlistModel: pl)
+                    ForEach(vm.popularPlaylists) { playlist in
+                        NavigationLink(destination: PlaylistView(playlist: playlist)) {
+                            VerPlaylistCell(playlistModel: playlist)
+                                .onAppear {
+                                    vm.playlistListens(playlist: playlist)
+                                }
                         }
-                        
                     }
                 }
                 .offset(x: 16)
             }
             .frame(height: 191)
         }
-        .padding(.top)
     }
 }
 

@@ -10,10 +10,18 @@ import SwiftUI
 struct HorPlaylistCellWithEditMode: View {
     // MARK: - Properties
     let playlistModel: PlaylistModel
+    let toggleCompletion: () -> Void
 
     // MARK: - Body
     var body: some View {
         HStack(spacing: 14) {
+            
+            // MARK: Toggle
+            Image(playlistModel.isSelected ? "select" : "unselect")
+                .resizable()
+                .scaledToFit()
+                .frame(width: 20, height: 20)
+                .padding(.leading)
             
             // MARK: - Image
             Image(uiImage: playlistModel.image)
@@ -32,6 +40,9 @@ struct HorPlaylistCellWithEditMode: View {
                     .descriptionFont()
             }
             Spacer()
+        }
+        .onTapGesture {
+            toggleCompletion()
         }
     }
 }

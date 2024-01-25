@@ -13,18 +13,18 @@ struct MusicPlayerView: View {
     
     // MARK: - Properties
     @EnvironmentObject var vm: ViewModel
-    @State var selectedRow = Set<UUID>()
     
     // MARK: - Body
     var body: some View {
         ScrollView(showsIndicators: false) {
             VStack {
+                
                 // MARK: - Subviews
                 Possibilities()
                 
                 Spacer()
                 
-                if vm.songs.isEmpty {
+                if vm.allSongs.isEmpty {
                     VStack {
                         Spacer(minLength: 150)
                         NoSongs()
@@ -32,10 +32,12 @@ struct MusicPlayerView: View {
                     .frame(maxWidth: .infinity)
                 } else {
                     RecentlyImported()
-                    PopularPlaylists()
+                    if !vm.popularPlaylists.isEmpty {
+                        PopularPlaylists()
+                    }
+                    
                     AllMusic()
                 }
-                
                 Spacer()
             }
             .customBarButton(name: "magnifyingglass", width: 19, height: 19, placement: .topBarTrailing) {  }
@@ -49,6 +51,7 @@ struct MusicPlayerView: View {
     NavigationView {
         MusicPlayerView()
             .environmentObject(ViewModel())
+            .environmentObject(VMImportManager())
             .preferredColorScheme(.dark)
     }
 }

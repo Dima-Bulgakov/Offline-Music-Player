@@ -10,7 +10,6 @@ import SwiftUI
 struct RecentlyImportedView: View {
     
     // MARK: - Properties
-//    @State var searchText: String = ""
     @Environment (\.dismiss) private var dismiss
     @EnvironmentObject var vm: ViewModel
     
@@ -20,7 +19,7 @@ struct RecentlyImportedView: View {
             VStack {
                 
                 // MARK: - Subviews
-                SearchBar()
+                RecentlySearchBar()
                 
                 HStack(spacing: 16) {
                     ShuffleButton()
@@ -36,9 +35,12 @@ struct RecentlyImportedView: View {
             // MARK: - Navigation Bar
             .navigationBarBackButtonHidden(true)
             .navigationTitle("Recently Imported")
-            .customBarButton(name: "back", width: 40, height: 0, placement: .topBarLeading) { dismiss() }
-            .customBarButton(name: "twoArrow", width: 25, height: 0, placement: .topBarTrailing) { vm.reverseOrder() }
+            .customBarButton(name: "back", width: 40, height: 0, placement: .topBarLeading) {
+                dismiss() }
+            .customBarButton(name: "twoArrow", width: 25, height: 0, placement: .topBarTrailing) {
+                vm.reverseOrder() }
         }
+        .padding(.bottom, 120)
     }
 }
 

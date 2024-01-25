@@ -8,11 +8,23 @@
 import SwiftUI
 
 struct ButtonForEditMode: View {
+    
+    let name: String
+    let width: CGFloat
+    let action: () -> ()
+    
     var body: some View {
-        Text(/*@START_MENU_TOKEN@*/"Hello, World!"/*@END_MENU_TOKEN@*/)
+        Button {
+            action()
+        } label: {
+            Image(name)
+                .resizable()
+                .scaledToFit()
+                .frame(width: width)
+        }
     }
 }
 
-#Preview {
-    ButtonForEditMode()
-}
+//#Preview {
+//    ButtonForEditMode()
+//}

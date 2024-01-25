@@ -16,9 +16,13 @@ struct RecentlyList: View {
     var body: some View {
         ScrollView {
             LazyVStack(spacing: 14) {
-                ForEach(vm.songs.prefix(12)) { song in
+                ForEach(vm.recentlyImported) { song in
                     HStack {
-                        ArtistCellWithDuration(songModel: song)
+                        SongCellWithDuration(songModel: song)
+                            .onTapGesture {
+                                vm.playAudio(data: song.data, playlist: vm.recentlyImported)
+                                vm.setCurrentSong(song, index: vm.recentlyImported.firstIndex(of: song))
+                            }
                     }
                     .listRowBackground(Color.bg)
                 }

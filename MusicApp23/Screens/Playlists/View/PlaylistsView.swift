@@ -7,16 +7,28 @@
 
 import SwiftUI
 
+// MARK: - Enum Buttons
+enum PlaylistsAndFavoritesTab: String, CaseIterable, Identifiable {
+    case myPlaylists = "My Playlists"
+    case favorites = "Favorites"
+    
+    var id: String { rawValue }
+}
+
+var sampleTabs: [PlaylistsAndFavoritesTab] = PlaylistsAndFavoritesTab.allCases
+
+
+// MARK: - Main View
 struct PlaylistsView: View {
     
-    // MARK: - Properties
+    // MARK: Properties
     @State var offset: CGFloat = 0
-    @State var currentTab: Tab = sampleTabs.first!
+    @State var currentTab: PlaylistsAndFavoritesTab = sampleTabs.first!
     @State var isTapped: Bool = false
     @EnvironmentObject var vm: ViewModel
     @StateObject var gestureManager: GestureManager = .init()
     
-    // MARK: - Body
+    // MARK: Body
     var body: some View {
         VStack {
             GeometryReader { proxy in
@@ -24,33 +36,49 @@ struct PlaylistsView: View {
                 
                 VStack {
                     
-                    // MARK: - My Playlists And Favorite Buttons
+                    // MARK: My Playlists And Favorite Buttons
                     DynamicTabHeader(size: screenSize)
                     
-                    PopularPlaylists()
-                                        
-                    // MARK: - TabView
+                    // MARK: TabView
                     TabView(selection: $currentTab) {
                         ForEach(sampleTabs) { tab in
-                            PlaylistsList(playlists: tab == sampleTabs[0] ? vm.myPlaylists : vm.favoritePlaylists)
-                                .offsetX { value in
-                                    if currentTab == tab && !isTapped {
-                                        offset = value - (screenSize.width * CGFloat(indexOf(tab: tab)))
+                            if tab == sampleTabs[0] {
+                                MyPlaylists()
+                                    .offsetX { value in
+                                        if currentTab == tab && !isTapped {
+                                            offset = value - (screenSize.width * CGFloat(indexOf(tab: tab)))
+                                        }
+                                        if value == 0 && isTapped {
+                                            isTapped = false
+                                        }
+                                        if isTapped && gestureManager.isInteracting {
+                                            isTapped = false
+                                        }
                                     }
-                                    if value == 0 && isTapped {
-                                        isTapped = false
+                                    .tag(tab)
+                                
+                            } else {
+                                Favorites()
+                                    .offsetX { value in
+                                        if currentTab == tab && !isTapped {
+                                            offset = value - (screenSize.width * CGFloat(indexOf(tab: tab)))
+                                        }
+                                        if value == 0 && isTapped {
+                                            isTapped = false
+                                        }
+                                        if isTapped && gestureManager.isInteracting {
+                                            isTapped = false
+                                        }
                                     }
-                                    if isTapped && gestureManager.isInteracting {
-                                        isTapped = false
-                                    }
-                                }
-                                .tag(tab)
+                                    .tag(tab)
+                            }
                         }
                     }
                     .ignoresSafeArea()
                     .tabViewStyle(.page(indexDisplayMode: .never))
                     .onAppear(perform: gestureManager.addGesture)
                     .onDisappear(perform: gestureManager.removeGesture)
+                    
                 }
                 .frame(width: screenSize.width, height: screenSize.height)
             }
@@ -58,12 +86,33 @@ struct PlaylistsView: View {
         
         // MARK: - NavigationBar
         .customNavigationTitle(title: "Playlists")
-        .customBarButton(name: "edit", width: 32, height: 16, placement: .topBarTrailing) {
-            print("Search")
+        .customBarButton(name: vm.editModeFavorite ? "done" : "edit", width: 32, height: 16, placement: .topBarTrailing) {
+            
+            switch currentTab {
+            case .myPlaylists:
+                vm.editModePlaylists.toggle()
+            case .favorites:
+                vm.editModeFavorite.toggle()
+                if !vm.editModeFavorite {
+                    vm.unselectSongs()
+                }
+            }
+            vm.isPlayerPresented.toggle()
         }
+        
+        /// Button To Create New Playlist
         .customBarButton(name: "add", width: 25, height: 17, placement: .topBarTrailing) {
-            print("Search")
+            alertView(myPlaylists: $vm.allPlaylists) {
+                vm.isShowAddToPlaylistView = true
+            }
         }
+        NavigationLink(destination: AddToPlaylistView().onDisappear {
+            vm.unselectSongs()
+            vm.isShowAddToPlaylistView = false 
+        },isActive: $vm.isShowAddToPlaylistView) {
+            EmptyView()
+        }
+        .hidden()
     }
     
     // MARK: - Methods
@@ -72,7 +121,7 @@ struct PlaylistsView: View {
         VStack(alignment: .leading, spacing: 22) {
             
             HStack(spacing: 0) {
-                ForEach(Tab.allCases, id: \.self) { tab in
+                ForEach(PlaylistsAndFavoritesTab.allCases, id: \.self) { tab in
                     Text(tab.rawValue)
                         .fontWeight(.semibold)
                         .padding(.vertical, 10)
@@ -86,7 +135,7 @@ struct PlaylistsView: View {
                     .overlay(alignment: .leading, content: {
                         GeometryReader { _ in
                             HStack(spacing: 0) {
-                                ForEach(Tab.allCases) { tab in
+                                ForEach(PlaylistsAndFavoritesTab.allCases) { tab in
                                     Text(tab.rawValue)
                                         .fontWeight(.semibold)
                                         .padding(.vertical, 10)
@@ -130,7 +179,7 @@ struct PlaylistsView: View {
     }
     
     // MARK: Tab Index
-    func indexOf(tab: Tab) -> Int {
+    func indexOf(tab: PlaylistsAndFavoritesTab) -> Int {
         let index = sampleTabs.firstIndex { CTab in
             CTab == tab
         } ?? 0
@@ -140,50 +189,10 @@ struct PlaylistsView: View {
 }
 
 
-
 #Preview {
     NavigationView {
         PlaylistsView()
             .environmentObject(ViewModel())
             .preferredColorScheme(.dark)
-    }
-}
-
-// MARK: - Enum
-enum Tab: String, CaseIterable, Identifiable {
-    case myPlaylists = "My Playlists"
-    case favorite = "Favorites"
-    
-    var id: String { rawValue }
-}
-
-// MARK: - Tabs Array
-var sampleTabs: [Tab] = Tab.allCases
-
-// MARK: - Extension
-extension View {
-    @ViewBuilder
-    func offsetX(completion: @escaping (CGFloat) -> ()) -> some View {
-        self
-            .overlay {
-                GeometryReader { proxy in
-                    let minX = proxy.frame(in: .global).minX
-                    
-                    Color.clear
-                        .preference(key: OffsetKey.self, value: minX)
-                        .onPreferenceChange(OffsetKey.self) { value in
-                            completion(value)
-                        }
-                }
-            }
-    }
-}
-
-// MARK: - Struct
-struct OffsetKey: PreferenceKey {
-    static var defaultValue: CGFloat = 0
-    
-    static func reduce(value: inout CGFloat, nextValue: () -> CGFloat) {
-        value = nextValue()
     }
 }

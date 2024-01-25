@@ -9,11 +9,14 @@ import SwiftUI
 
 struct SongMenu: View {
     
+    // MARK: - Properties
+    @EnvironmentObject var vm: ViewModel
+    
     // MARK: - Body
     var body: some View {
         VStack(alignment: .leading) {
             Button {
-                // Add Action
+                vm.addToFavorites()
             } label: {
                 HStack {
                     Image("favoriteSM")
@@ -24,13 +27,12 @@ struct SongMenu: View {
                         .padding(.vertical, 5)
                     Text("Add to Favorite")
                         .songMenuFont()
-                    
                 }
                 .padding(.horizontal, 14)
             }
             Divider()
             Button {
-                // Add Action
+                vm.isShowChoosePlaylistView = true
             } label: {
                 HStack {
                     Image("playlistSM")
@@ -43,6 +45,12 @@ struct SongMenu: View {
                         .songMenuFont()
                 }
                 .padding(.horizontal, 14)
+                .sheet(isPresented: $vm.isShowChoosePlaylistView) {
+                    ChoosePlaylistView()
+                        .onDisappear {
+                            vm.resetPlaylistSelection()
+                        }
+                }
             }
             Divider()
             Button {
@@ -70,7 +78,7 @@ struct SongMenu: View {
 struct ConditionalCompactAdaptation: ViewModifier {
     
     @Environment(\.horizontalSizeClass) private var horizontalSizeClass
-
+    
     func body(content: Content) -> some View {
         if #available(iOS 16.4, *) {
             return content.presentationCompactAdaptation(.none)
@@ -83,4 +91,5 @@ struct ConditionalCompactAdaptation: ViewModifier {
 
 #Preview {
     SongMenu()
+        .environmentObject(ViewModel())
 }

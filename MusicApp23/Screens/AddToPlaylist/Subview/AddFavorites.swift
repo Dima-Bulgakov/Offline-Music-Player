@@ -8,11 +8,28 @@
 import SwiftUI
 
 struct AddFavorites: View {
+    
+    // MARK: - Properties
+    @EnvironmentObject var vm: ViewModel
+    
+    // MARK: - Body
     var body: some View {
-        Text(/*@START_MENU_TOKEN@*/"Hello, World!"/*@END_MENU_TOKEN@*/)
+        List {
+            ForEach(vm.favoriteSongs) { song in
+                AddMusicItem(songModel: song) {
+//                    vm.isSelectedSong(song: song)
+                    vm.isSelectedSongInArrays(model: song, playlist: &vm.favoriteSongs)
+                }
+            }
+            .listRowSeparator(.hidden)
+        }
+        .listStyle(PlainListStyle())
     }
 }
 
 #Preview {
     AddFavorites()
+        .environmentObject(ViewModel())
+        .preferredColorScheme(.dark)
 }
+

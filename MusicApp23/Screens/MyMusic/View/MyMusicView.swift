@@ -10,7 +10,6 @@ import SwiftUI
 struct MyMusicView: View {
     
     // MARK: - Properties
-//    @State var searchText: String = ""
     @EnvironmentObject var vm: ViewModel
     
     // MARK: - Body
@@ -19,13 +18,16 @@ struct MyMusicView: View {
             VStack {
                 
                 // MARK: - Subviews
-                SearchBar()
-                HStack(spacing: 16) {
-                    ShuffleButton()
-                    SortButton()
+                if !vm.editModeAllMusic {
+                    AllMusicSearchBar()
+                    HStack(spacing: 16) {
+                        ShuffleButton()
+                        SortButton()
+                    }
+                    .padding(.top, 14)
+                    .padding(.horizontal)
                 }
-                .padding(.top, 14)
-                .padding(.horizontal)
+                
                 MusicList()
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
@@ -34,12 +36,25 @@ struct MyMusicView: View {
         
         // MARK: - NavigationBar
         .customNavigationTitle(title: "My Music")
-        .customBarButton(name: "twoArrow", width: 25, height: 17, placement: .topBarTrailing) {
-            vm.reverseOrder()
+        .customBarButton(name: vm.editModeAllMusic ? "done" : "edit", width: 32, height: 16, placement: .topBarTrailing) {
+            vm.editModeAllMusic.toggle()
+            vm.isPlayerPresented.toggle()
+            if !vm.editModeAllMusic {
+                vm.unselectSongs()
+            }
         }
-        
+        .toolbar {
+            ToolbarItem(placement: .topBarTrailing) {
+                if !vm.editModeAllMusic {
+                    ButtonForEditMode(name: "twoArrow", width: 20) {
+                        vm.reverseOrder()
+                    }
+                }
+            }
+        }
     }
 }
+
 
 #Preview {
     NavigationView {

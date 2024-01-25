@@ -15,7 +15,7 @@ struct AllMusic: View {
     // MARK: - Body
     var body: some View {
         VStack(spacing: 16) {
-            HStack(alignment: .bottom) {
+            HStack(alignment: .center) {
                 
                 // MARK: - Title
                 Text("All Music")
@@ -38,9 +38,13 @@ struct AllMusic: View {
             // MARK: - List of Songs
             ScrollView {
                 LazyVStack(spacing: 14) {
-                    ForEach(vm.songs.prefix(15)) { song in
+                    ForEach(vm.allSongs.prefix(15)) { song in
                         HStack {
-                            ArtistCellWithDuration(songModel: song)
+                            SongCellWithDuration(songModel: song)
+                                .onTapGesture {
+                                    vm.playAudio(data: song.data, playlist: vm.allSongs)
+                                    vm.setCurrentSong(song, index: vm.allSongs.firstIndex(of: song))
+                                }
                         }
                         .listRowBackground(Color.bg)
                     }

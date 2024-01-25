@@ -12,6 +12,7 @@ struct MenuItem: View {
     // MARK: Properties
     let image: String
     let title: String
+    let isSelected: Bool
     
     // MARK: Body
     var body: some View {
@@ -22,14 +23,15 @@ struct MenuItem: View {
                     .scaledToFit()
                     .padding(.trailing, 10)
                 Text(title)
+                    .fontWeight(isSelected ? .bold : .regular)
             }
-            .foregroundStyle(.black)
+            .foregroundStyle(isSelected ? Color.accent : Color.black)
         }
     }
 }
 
 #Preview {
-    MenuItem(image: "home", title: "Home")
+    MenuItem(image: "home", title: "Home", isSelected: true)
         .frame(height: 22)
         .padding()
         .background(.white)

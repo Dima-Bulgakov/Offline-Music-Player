@@ -59,35 +59,40 @@ struct PlayerView: View {
                 
                 // MARK: - Description
                 HStack {
-                    if vm.isPlaying {
-                        if let currentSong = vm.currentSong {
-                            HStack {
-                                Text(currentSong.artist ?? "")
-                                    .artistFont()
-                                Text("-")
-                                Text(currentSong.name)
-                                    .songFont()
-                            }
-                            .padding(.bottom, 10)
+                    if let currentSong = vm.currentSong {
+                        HStack {
+                            Text(currentSong.artist ?? "")
+                                .artistFont()
+                            Text("-")
+                            Text(currentSong.name)
+                                .songFont()
                         }
                     } else {
                         Text("-")
-                            .padding(.bottom, 10)
                     }
                 }
+                .padding(.bottom, 10)
                 
                 // MARK: Buttons
                 HStack {
                     Spacer()
-                    CustomPlayerButton(image: "repeat", size: 18, color: Color.primaryFont) { }
+                    CustomPlayerButton(image: "repeat", size: 18, color: vm.isRepeat ? Color.gray : Color.primaryFont) {
+                        vm.toggleRepeat()
+                    }
                     Spacer()
-                    CustomPlayerButton(image: "backward", size: 24, color: Color.primaryFont) { vm.backward() }
+                    CustomPlayerButton(image: "backward", size: 24, color: Color.primaryFont) {
+                        vm.backward()
+                    }
                     Spacer()
                     PlayPauseButton()
                     Spacer()
-                    CustomPlayerButton(image: "forward", size: 24, color: Color.primaryFont) { vm.forward() }
+                    CustomPlayerButton(image: "forward", size: 24, color: Color.primaryFont) {
+                        vm.forward()
+                    }
                     Spacer()
-                    CustomPlayerButton(image: "shuffle", size: 18, color: vm.isShuffle ? Color.gray : Color.primaryFont) { vm.shuffleSongs() }
+                    CustomPlayerButton(image: "shuffle", size: 18, color: vm.isShuffle ? Color.gray : Color.primaryFont) {
+                        vm.shuffleSongs()
+                    }
                     Spacer()
                 }
                 .font(.largeTitle)
@@ -109,6 +114,7 @@ struct PlayerView: View {
         Color.white
         ContentView()
             .environmentObject(ViewModel())
+            .environmentObject(VMImportManager())
             .preferredColorScheme(.dark)
     }
 }
