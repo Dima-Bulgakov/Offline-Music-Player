@@ -21,14 +21,17 @@ struct ContentView: View {
                 .zIndex(1)
             
             // MARK: - Player
-            if vm.isPlayerPresented {
-                if !vm.isShowAddToPlaylistView {
-                    PlayerView()
-                        .offset(y: 30)
-                        .zIndex(2)
+            if !vm.isEditModeFavoriteShow || !vm.isEditModeAllMusicShow || !vm.isEditModePlaylistsShow || !vm.isEditModeInPlaylistShow {
+                if vm.isPlayerPresented {
+                    if !vm.isShowAddToPlaylistView {
+                        PlayerView()
+                            .offset(y: 30)
+                            .zIndex(2)
+                    }
                 }
             }
         }
+        .ignoresSafeArea(.keyboard) 
     }
 }
 
