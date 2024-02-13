@@ -15,69 +15,28 @@ struct SortMenu: View {
     // MARK: - Body
     var body: some View {
         VStack(alignment: .leading) {
-            Button {
+            
+            // MARK: Sorting By Artist
+            CustomeMenuButton(image: "artist", text: "Artist (A-z)") {
                 vm.sortSongsByArtist()
-            } label: {
-                HStack {
-                    Image("artist")
-                        .resizable()
-                        .aspectRatio(contentMode: .fit)
-                        .frame(width: 18)
-                        .padding(.trailing, 8)
-                        .padding(.vertical, 5)
-                    Text("Artist (A-z)")
-                        .songMenuFont()
-                    
-                }
-                .padding(.horizontal, 14)
             }
             Divider()
-            Button {
+            
+            // MARK: Sorting By Title
+            CustomeMenuButton(image: "title", text: "Title (A-z)") {
                 vm.sortSongsByTitle()
-            } label: {
-                HStack {
-                    Image("title")
-                        .resizable()
-                        .aspectRatio(contentMode: .fit)
-                        .frame(width: 18)
-                        .padding(.trailing, 8)
-                        .padding(.vertical, 5)
-                    Text("Title (A-z)")
-                        .songMenuFont()
-                }
-                .padding(.horizontal, 14)
             }
             Divider()
-            Button {
+            
+            // MARK: Sorting By Date
+            CustomeMenuButton(image: "date", text: "Date") {
                 vm.sortSongsByDate()
-            } label: {
-                HStack {
-                    Image("date")
-                        .resizable()
-                        .aspectRatio(contentMode: .fit)
-                        .frame(width: 18)
-                        .padding(.trailing, 8)
-                        .padding(.vertical, 5)
-                    Text("Date")
-                        .songMenuFont()
-                }
-                .padding(.horizontal, 14)
             }
             Divider()
-            Button {
+            
+            // MARK: Sorting By Duration
+            CustomeMenuButton(image: "duration", text: "Duration") {
                 vm.sortSongsByDuration()
-            } label: {
-                HStack {
-                    Image("duration")
-                        .resizable()
-                        .aspectRatio(contentMode: .fit)
-                        .frame(width: 18)
-                        .padding(.trailing, 8)
-                        .padding(.vertical, 5)
-                    Text("Duration")
-                        .songMenuFont()
-                }
-                .padding(.horizontal, 14)
             }
         }
         .frame(width: 175, height: 168)

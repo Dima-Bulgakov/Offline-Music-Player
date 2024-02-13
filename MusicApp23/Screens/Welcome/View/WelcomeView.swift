@@ -11,32 +11,46 @@ struct WelcomeView: View {
     
     // MARK: - Properties
     @Environment (\.dismiss) private var dismiss
+    @Environment(\.presentationMode) var presentationMode
     
     // MARK: - Body
     var body: some View {
         VStack {
-            VStack {
-                VStack(alignment: .leading) {
-                    
-                    // MARK: - Subviews
-                    WelcomeTitleView()
-                    WelcomeButtonsView()
-                }
-                BottomText()
-                Spacer()
+            VStack(alignment: .leading) {
+                WelcomeTitleView()
+                    VStack {
+                        // MARK: - Subviews
+                        WelcomeButtonsView()
+                        Spacer()
+                    }
                 
                 // MARK: - Navigation Bar
-                .customBarButton(name: "crown", width: 36, height: 28, placement: .topBarLeading) {}
-                .customBarButton(name: "question", width: 30, height: 30, placement: .topBarTrailing) {}
+                .customBarButton(name: "crown", width: 36, height: 28, placement: .topBarLeading) {
+                    
+                }
+                .customBarButton(name: "question", width: 30, height: 30, placement: .topBarTrailing) {
+                    
+                }
+                .customBarButton(name: "back", width: 40, height: 14, placement: .topBarLeading) {
+                    dismiss()
+                }
+                .gesture(DragGesture().onEnded { value in
+                    if value.translation.width > 100 {
+                        presentationMode.wrappedValue.dismiss()
+                    }
+                })
                 .navigationBarBackButtonHidden(true)
-                .customBarButton(name: "back", width: 40, height: 0, placement: .topBarLeading) { dismiss() }
             }
             .padding()
         }
+        .customNavigationTitle(title: "Welcome")
     }
 }
 
 #Preview {
-    WelcomeView()
+    NavigationView {
+        WelcomeView()
+            .environmentObject(VMImportManager())
         .preferredColorScheme(.dark)
+    }
 }

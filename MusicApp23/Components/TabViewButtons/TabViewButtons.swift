@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-// MARK: - Struct
+// MARK: - For Head Buttons (My Playlists & Favorites) (All Music & Favorites)
 struct OffsetKey: PreferenceKey {
     static var defaultValue: CGFloat = 0
     
@@ -16,7 +16,6 @@ struct OffsetKey: PreferenceKey {
     }
 }
 
-// MARK: - Extension
 extension View {
     @ViewBuilder
     func offsetX(completion: @escaping (CGFloat) -> ()) -> some View {

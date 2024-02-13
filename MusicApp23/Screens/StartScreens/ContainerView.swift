@@ -22,4 +22,7 @@ struct ContainerView: View {
 
 #Preview {
     ContainerView()
+        .environmentObject(ViewModel())
+        .environmentObject(VMImportManager())
+        .preferredColorScheme(.dark)
 }

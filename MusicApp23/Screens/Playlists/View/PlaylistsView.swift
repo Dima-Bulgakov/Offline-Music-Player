@@ -15,6 +15,7 @@ enum PlaylistsAndFavoritesTab: String, CaseIterable, Identifiable {
     var id: String { rawValue }
 }
 
+/// All Cases Enums Buttons
 var sampleTabs: [PlaylistsAndFavoritesTab] = PlaylistsAndFavoritesTab.allCases
 
 
@@ -82,30 +83,47 @@ struct PlaylistsView: View {
                 }
                 .frame(width: screenSize.width, height: screenSize.height)
             }
+            .background(Color.bg)
+            .padding(.bottom, vm.isEditModeFavoriteShow || vm.isEditModePlaylistsShow ? 0 : 140)
+            .ignoresSafeArea(.keyboard)
         }
+        
         
         // MARK: - NavigationBar
         .customNavigationTitle(title: "Playlists")
-        .customBarButton(name: vm.editModeFavorite ? "done" : "edit", width: 32, height: 16, placement: .topBarTrailing) {
+        .customBarButton(name: vm.isEditModeFavoriteShow || vm.isEditModePlaylistsShow ? "done" : "edit", width: 32, height: 16, placement: .topBarTrailing) {
             
             switch currentTab {
             case .myPlaylists:
-                vm.editModePlaylists.toggle()
+                if !vm.allPlaylists.isEmpty {
+                    vm.isEditModePlaylistsShow.toggle()
+                    vm.isPlayerPresented.toggle()
+                }
+                vm.isEditModeFavoriteShow = false
             case .favorites:
-                vm.editModeFavorite.toggle()
-                if !vm.editModeFavorite {
+                if !vm.favoriteSongs.isEmpty {
+                    vm.isEditModeFavoriteShow.toggle()
+                    vm.isPlayerPresented.toggle()
+                }
+                vm.isEditModePlaylistsShow = false
+                if !vm.isEditModeFavoriteShow {
                     vm.unselectSongs()
                 }
             }
-            vm.isPlayerPresented.toggle()
+            vm.isMenuVisible = false
         }
         
         /// Button To Create New Playlist
         .customBarButton(name: "add", width: 25, height: 17, placement: .topBarTrailing) {
-            alertView(myPlaylists: $vm.allPlaylists) {
+            alertAddPlaylist(myPlaylists: $vm.allPlaylists) {
+                vm.isEditModePlaylistsShow = false
+                vm.isEditModeFavoriteShow = false
+                vm.isPlayerPresented = true
                 vm.isShowAddToPlaylistView = true
+                vm.isMenuVisible = false
             }
         }
+        
         NavigationLink(destination: AddToPlaylistView().onDisappear {
             vm.unselectSongs()
             vm.isShowAddToPlaylistView = false 

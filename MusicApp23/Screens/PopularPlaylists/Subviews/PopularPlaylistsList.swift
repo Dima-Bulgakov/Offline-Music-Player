@@ -18,9 +18,9 @@ struct PopularPlaylistsList: View {
             ForEach(vm.popularPlaylists) { playlist in
                 NavigationLink(destination: PlaylistView(playlist: playlist)) {
                     HorPlaylistCell(playlistModel: playlist)
-                        .onAppear {
-                            vm.playlistListens(playlist: playlist)
-                        }
+//                        .onAppear {
+//                            vm.playlistListens(playlist: playlist)
+//                        }
                 }
             }
             .listRowSeparator(.hidden)

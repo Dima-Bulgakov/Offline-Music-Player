@@ -11,19 +11,19 @@ struct HorPlaylistCell: View {
     
     // MARK: - Properties
     let playlistModel: PlaylistModel
-
+    
     // MARK: - Body
     var body: some View {
         HStack(spacing: 14) {
             
-            // MARK: - Image
+            // MARK: Image
             Image(uiImage: playlistModel.image)
                 .resizable()
                 .scaledToFill()
                 .frame(width: 85, height: 85)
                 .cornerRadius(10)
             
-            // MARK: - Description
+            // MARK: Description
             VStack(alignment: .leading) {
                 Text(playlistModel.name)
                     .nameFont()
@@ -37,7 +37,7 @@ struct HorPlaylistCell: View {
     }
 }
 
-//#Preview {
-//    HorPlaylistComponents(playlistModel: PlaylistModel(name: "For Car", image: UIImage(imageLiteralResourceName: "testPlaylistImage"), songs: []))
-//    .preferredColorScheme(.dark)
-//}
+#Preview {
+    HorPlaylistCell(playlistModel: PlaylistModel(name: "For Car", image: UIImage(imageLiteralResourceName: "testPlaylistImage"), songs: []))
+        .preferredColorScheme(.dark)
+}

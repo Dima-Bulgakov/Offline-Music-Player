@@ -25,6 +25,7 @@ struct ButtonForEditMode: View {
     }
 }
 
-//#Preview {
-//    ButtonForEditMode()
-//}
+#Preview {
+    ButtonForEditMode(name: "delete", width: 75, action: {})
+        .preferredColorScheme(.dark)
+}

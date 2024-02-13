@@ -7,8 +7,17 @@
 
 import Foundation
 import AVFAudio
+import MediaPlayer
 
-// MARK: - Player Methods
+// MARK: - Setting The Remote Control On A Locked Screen
+class AppDelegate: NSObject, UIApplicationDelegate {
+    func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
+        application.beginReceivingRemoteControlEvents()
+        return true
+    }
+}
+
+// MARK: - Player Methods Extension
 extension ViewModel {
     
     func updateProgress() {
@@ -18,6 +27,7 @@ extension ViewModel {
     
     func seekAudio(to time: TimeInterval) {
         audioPlayer?.currentTime = time
+        notifyPlaybackProgressUpdated()
     }
     
     func setCurrentSong(_ song: SongModel?, index: Int?) {
@@ -25,26 +35,28 @@ extension ViewModel {
         currentSongIndex = index
     }
     
-    func playAudio(data: Data, playlist: [SongModel]) {
-        do {
-            self.audioPlayer = try AVAudioPlayer(data: data)
-            self.audioPlayer?.delegate = self
-            self.audioPlayer?.prepareToPlay()
-            self.audioPlayer?.play()
-            isPlaying = true
-            totalTime = audioPlayer?.duration ?? 0.0
-            
-            if isRepeat {
-                self.audioPlayer?.numberOfLoops = -1
-            } else {
-                self.audioPlayer?.numberOfLoops = 0
-            }
 
-            currentPlaylist = playlist
-        } catch {
-            print("Error playing audio: \(error.localizedDescription)")
+    func playAudio(data: Data, playlist: [SongModel]) {
+            do {
+                self.audioPlayer = try AVAudioPlayer(data: data)
+                self.audioPlayer?.delegate = self
+                self.audioPlayer?.prepareToPlay()
+                self.audioPlayer?.play()
+                isPlaying = true
+                totalTime = audioPlayer?.duration ?? 0.0
+                
+                if isRepeat {
+                    self.audioPlayer?.numberOfLoops = -1
+                } else {
+                    self.audioPlayer?.numberOfLoops = 0
+                }
+                currentPlaylist = playlist
+                /// Call "setupNowPlaying()" After Starting To Play A New Song
+                updateNowPlayingInfo()
+            } catch {
+                print("Error playing audio: \(error.localizedDescription)")
+            }
         }
-    }
     
     func toggleRepeat() {
         isRepeat.toggle()
@@ -133,5 +145,103 @@ extension ViewModel {
         formatter.unitsStyle = .positional
         formatter.zeroFormattingBehavior = .pad
         return formatter.string(from: duration) ?? ""
+    }
+    
+    // MARK: - Lock Screen Remote Control Settings
+    func setupRemoteTransportControls() {
+        let commandCenter = MPRemoteCommandCenter.shared()
+        
+        commandCenter.playCommand.isEnabled = true
+        commandCenter.playCommand.addTarget { [unowned self] event in
+            if !self.isPlaying {
+                self.playPause()
+                return .success
+            }
+            return .commandFailed
+        }
+        
+        commandCenter.pauseCommand.isEnabled = true
+        commandCenter.pauseCommand.addTarget { [unowned self] event in
+            if self.isPlaying {
+                self.playPause()
+                return .success
+            }
+            return .commandFailed
+        }
+        
+        commandCenter.nextTrackCommand.isEnabled = true
+        commandCenter.nextTrackCommand.addTarget { [unowned self] event in
+            self.forward()
+            return .success
+        }
+        
+        commandCenter.previousTrackCommand.isEnabled = true
+        commandCenter.previousTrackCommand.addTarget { [unowned self] event in
+            self.backward()
+            return .success
+        }
+        
+        commandCenter.changeRepeatModeCommand.isEnabled = true
+        commandCenter.changeRepeatModeCommand.addTarget { [unowned self] event in
+            self.toggleRepeat()
+            return .success
+        }
+        
+        commandCenter.changeShuffleModeCommand.isEnabled = true
+        commandCenter.changeShuffleModeCommand.addTarget { [unowned self] event in
+            self.shuffleSongs()
+            return .success
+        }
+        
+        commandCenter.changePlaybackPositionCommand.isEnabled = true
+        commandCenter.changePlaybackPositionCommand.addTarget { [unowned self] event in
+            if let event = event as? MPChangePlaybackPositionCommandEvent {
+                self.seekAudio(to: event.positionTime)
+                return .success
+            }
+            return .commandFailed
+        }
+        
+        /// Adding A Listener To Update Progress When A Notification Is Received
+        NotificationCenter.default.addObserver(forName: .playbackProgressUpdated, object: nil, queue: nil) { [weak self] _ in
+            self?.updateNowPlayingInfo()
+        }
+    }
+
+
+    func updateNowPlayingInfo() {
+        // Определяем информацию о текущем проигрываемом треке
+        var nowPlayingInfo = [String: Any]()
+
+        if let currentSong = currentSong {
+            // Устанавливаем название трека
+            nowPlayingInfo[MPMediaItemPropertyTitle] = currentSong.name
+
+            // Добавляем обложку
+            if let coverImageData = currentSong.coverImageData,
+               let coverImage = UIImage(data: coverImageData) {
+                let artwork = MPMediaItemArtwork(boundsSize: coverImage.size, requestHandler: { _ -> UIImage in
+                    return coverImage
+                })
+                nowPlayingInfo[MPMediaItemPropertyArtwork] = artwork
+                print("Обложка установлена успешно.")
+            } else {
+                print("Нет данных об обложке для текущей песни.")
+            }
+        } else {
+            print("Не удалось получить данные из URL аудиоплеера.")
+        }
+
+        // Добавляем информацию о длительности песни и текущем времени воспроизведения
+        nowPlayingInfo[MPNowPlayingInfoPropertyElapsedPlaybackTime] = audioPlayer?.currentTime
+        nowPlayingInfo[MPMediaItemPropertyPlaybackDuration] = audioPlayer?.duration
+
+        // Устанавливаем метаданные
+        MPNowPlayingInfoCenter.default().nowPlayingInfo = nowPlayingInfo
+    }
+    
+    /// Method To Notify The Remote On Locked Screen, That A Playback Progress Was Update
+    func notifyPlaybackProgressUpdated() {
+        NotificationCenter.default.post(name: .playbackProgressUpdated, object: self)
     }
 }

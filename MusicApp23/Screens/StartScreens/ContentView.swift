@@ -11,6 +11,7 @@ struct ContentView: View {
     
     // MARK: - Properties
     @EnvironmentObject var vm: ViewModel
+    @EnvironmentObject var importManager: VMImportManager
     
     // MARK: - Body
     var body: some View {
@@ -27,11 +28,46 @@ struct ContentView: View {
                         PlayerView()
                             .offset(y: 30)
                             .zIndex(2)
+                            .onTapGesture {
+                                vm.isMenuVisible = false
+                            }
                     }
                 }
             }
         }
         .ignoresSafeArea(.keyboard) 
+        
+        // MARK: - Import Sheets And Alerts
+        /// Sheet For Import Files
+        .sheet(isPresented: self.$importManager.isFilesPresented) {
+            ImportFileManager(songs: $vm.allSongs, file: $importManager.selectedDocument, fileName: $importManager.selectedDocumentName, vm: vm)
+        }
+        /// Sheet For Import Camera's Files
+        .sheet(isPresented: $importManager.isPhotoPickerPresented) {
+            ImportCameraManager(audioPlayer: $vm.audioPlayer, vm: vm, onAudioLoaded: { songName in
+                vm.addSong(name: songName, data: Data(), artist: nil, coverImageData: nil, duration: nil)
+            })
+        }
+        .sheet(isPresented: $importManager.isShowWiFiTransferSheet) {
+//            WiFiTransferView()
+        }
+        .overlay(
+            Group {
+                /// Alert For Share Import
+                if importManager.isShowShareAlert {
+                    AlertForPossibilities(title: .share, image: "shareAlert") {
+                        importManager.isShowShareAlert.toggle()
+                    }
+                    .transition(.scale)
+                    /// Alert For Safari Import
+                } else if importManager.isShowSafariAlert {
+                    AlertForPossibilities(title: .safari, image: "DeathStar") {
+                        importManager.isShowSafariAlert.toggle()
+                    }
+                    .transition(.scale)
+                }
+            }
+        )
     }
 }
 

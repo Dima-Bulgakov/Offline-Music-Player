@@ -19,7 +19,7 @@ struct SettingListCell: View {
         VStack {
             HStack {
                 
-                // MARK: - Image
+                // MARK: Image
                 Image(image)
                     .resizable()
                     .scaledToFit()
@@ -31,12 +31,12 @@ struct SettingListCell: View {
                     )
                     .padding(.trailing, 9)
                 
-                // MARK: - Title
+                // MARK: Title
                 Text(title)
                     .nameFont()
                 Spacer()
                 
-                // MARK: - Arrow
+                // MARK: Arrow
                 Image("arrow")
                     .resizable()
                     .scaledToFit()

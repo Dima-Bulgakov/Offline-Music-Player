@@ -15,4 +15,9 @@ final class VMImportManager: ObservableObject {
     
     @Published var selectedDocumentName: String?
     @Published var selectedDocument: Data?
+    
+    @Published var isShowShareAlert = false
+    @Published var isShowSafariAlert = false
+    
+    @Published var isShowWiFiTransferSheet = false
 }

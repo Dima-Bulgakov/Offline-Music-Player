@@ -9,37 +9,42 @@ import SwiftUI
 
 struct NoSongs: View {
     
-    // MARK: - Properties
     var body: some View {
         VStack {
+            Spacer()
             
-            // MARK: - Image
-            Image("noSongs")
-                .resizable()
-                .scaledToFit()
-                .frame(width: 202, height: 202)
-            
-            // MARK: - Description
-            HStack {
-                VStack {
-                    HStack {
-                        Text("Please")
-                            .importButtonFont()
-                        NavigationLink(destination: WelcomeView()) {
-                            Text("import")
-                                .importLinkFont()
+            VStack {
+                Image("noSongs")
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: 200, height: 200)
+                HStack {
+                    VStack {
+                        HStack {
+                            Text("Please")
+                                .importButtonFont()
+                            NavigationLink(destination: WelcomeView()) {
+                                Text("import")
+                                    .importLinkFont()
+                            }
+                            Text("music")
+                                .importButtonFont()
                         }
-                        Text("music")
+                        Text("to starting use the app")
                             .importButtonFont()
                     }
-                    Text("to starting use the app")
-                        .importButtonFont()
+                    .padding(.top, 10)
                 }
-                .padding(.top, 25)
             }
+            Spacer()
         }
+        .frame(height: 400)
+        .frame(maxWidth: .infinity)
+        .edgesIgnoringSafeArea(.all)
     }
 }
+
+
 
 #Preview {
     NoSongs()

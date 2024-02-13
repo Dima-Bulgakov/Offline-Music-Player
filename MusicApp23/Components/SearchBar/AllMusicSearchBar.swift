@@ -17,15 +17,19 @@ struct AllMusicSearchBar: View {
     var body: some View {
         HStack {
             HStack {
+                
+                /// Text Field
                 TextField("\(magnifyingglass) Search", text: $vm.searchAllMusic)
                 .multilineTextAlignment(.center)
                 .accentColor(.accent)
                 .colorMultiply(.white)
                 .padding(8)
-                .onChange(of: vm.searchAllMusic, perform: { _ in
+                .onChange(of: vm.searchAllMusic) { _ in
                     vm.searchSongsByArtist()
-                })
+                }
             }
+            
+            /// Shape
             .overlay(
                 RoundedRectangle(cornerRadius: 10)
                     .stroke(Color.accent, lineWidth: 1)
@@ -37,8 +41,8 @@ struct AllMusicSearchBar: View {
     }
 }
 
-//#Preview {
-//    SearchBar()
-//        .environmentObject(ViewModel())
-//        .preferredColorScheme(.dark)
-//}
+#Preview {
+    AllMusicSearchBar()
+        .environmentObject(ViewModel())
+        .preferredColorScheme(.dark)
+}

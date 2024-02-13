@@ -11,7 +11,7 @@ struct PlayerView: View {
     
     // MARK: - Properties
     @EnvironmentObject var vm: ViewModel
-    @State private var isShowSongMenu = false
+    @State private var isDraggingSlider = false
     
     // MARK: - Body
     var body: some View {
@@ -30,12 +30,13 @@ struct PlayerView: View {
             .padding(.horizontal, 8)
             
             // MARK: - Timeline
-            Slider(value: Binding(get: {
-                vm.currentTime
-            }, set: { newValue in
-                vm.seekAudio(to: newValue)
-            }), in: 0...vm.totalTime)
-            .foregroundColor(.white)
+            Slider(value: $vm.currentTime, in: 0...vm.totalTime) { editing in
+                isDraggingSlider = editing
+                if !editing {
+                    vm.seekAudio(to: vm.currentTime)
+                    
+                }
+            }
             .zIndex(1)
             .onAppear {
                 Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { _ in
@@ -47,13 +48,17 @@ struct PlayerView: View {
                 
                 // MARK: - Menu
                 Button {
-                    self.isShowSongMenu.toggle()
+                    if let currentSong = vm.currentSong {
+                        vm.isShowSongMenu.toggle()
+                        vm.isMenuVisible = false
+                    }
                 } label: {
                     Image(systemName: "ellipsis")
                         .foregroundStyle(Color.white)
+                        .padding(5)
+                        .padding(.top)
                 }
-                .padding(.top)
-                .popover(isPresented: $isShowSongMenu, attachmentAnchor: .point(.bottom), arrowEdge: .bottom, content: {
+                .popover(isPresented: $vm.isShowSongMenu, attachmentAnchor: .point(.bottom), arrowEdge: .bottom, content: {
                     SongMenu()
                 })
                 
@@ -71,27 +76,31 @@ struct PlayerView: View {
                         Text("-")
                     }
                 }
-                .padding(.bottom, 10)
+                .padding(.bottom, 8)
                 
-                // MARK: Buttons
+                // MARK: Player Buttons
                 HStack {
                     Spacer()
                     CustomPlayerButton(image: "repeat", size: 18, color: vm.isRepeat ? Color.gray : Color.primaryFont) {
                         vm.toggleRepeat()
+                        vm.isMenuVisible = false
                     }
                     Spacer()
                     CustomPlayerButton(image: "backward", size: 24, color: Color.primaryFont) {
                         vm.backward()
+                        vm.isMenuVisible = false
                     }
                     Spacer()
                     PlayPauseButton()
                     Spacer()
                     CustomPlayerButton(image: "forward", size: 24, color: Color.primaryFont) {
                         vm.forward()
+                        vm.isMenuVisible = false
                     }
                     Spacer()
                     CustomPlayerButton(image: "shuffle", size: 18, color: vm.isShuffle ? Color.gray : Color.primaryFont) {
                         vm.shuffleSongs()
+                        vm.isMenuVisible = false
                     }
                     Spacer()
                 }
@@ -118,5 +127,3 @@ struct PlayerView: View {
             .preferredColorScheme(.dark)
     }
 }
-
-

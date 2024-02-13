@@ -17,7 +17,7 @@ struct Favorites: View {
         VStack {
             List {
                 ForEach(vm.favoriteSongs) { song in
-                    if vm.editModeFavorite {
+                    if vm.isEditModeFavoriteShow {
                         SongCellWithDurationAndEditMode(songModel: song) {
                             vm.isSelectedSongInArrays(model: song, playlist: &vm.favoriteSongs)
                         }
@@ -30,21 +30,27 @@ struct Favorites: View {
                     }
                 }
                 .listRowSeparator(.hidden)
+                .listRowBackground(Color.bg)
             }
             .listStyle(PlainListStyle())
-            .padding(.bottom, vm.editModeFavorite ? 0 : 130)
-            
+
             // MARK: Bottom Buttons
-            if vm.editModeFavorite {
+            if vm.isEditModeFavoriteShow {
                 HStack {
+                    
+                    /// Select All Button
                     ButtonForEditMode(name: "selectAll", width: 100) {
                         vm.selectAllSongs()
                     }
                     Spacer()
+                    
+                    /// Add To Button
                     ButtonForEditMode(name: "addTo", width: 80) {
                         vm.isShowChoosePlaylistView = true
                         vm.selectedSongs = vm.favoriteSongs.filter { $0.isSelected }
                     }
+                    
+                    /// Sheet Choose Playlists For "Add To" Button
                     .sheet(isPresented: $vm.isShowChoosePlaylistView) {
                         ChoosePlaylistView()
                             .onDisappear {
@@ -52,6 +58,8 @@ struct Favorites: View {
                             }
                     }
                     Spacer()
+                    
+                    /// Delete Button
                     ButtonForEditMode(name: "delete", width: 75) {
                         vm.deleteSelectedSongsFromFavorites()
                     }

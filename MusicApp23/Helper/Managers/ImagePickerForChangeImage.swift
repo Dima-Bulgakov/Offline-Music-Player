@@ -9,18 +9,24 @@ import SwiftUI
 import UIKit
 
 struct ImagePicker: UIViewControllerRepresentable {
+    
+    // MARK: - Properties
     @Binding var selectedImage: UIImage?
     @Environment(\.presentationMode) private var presentationMode
     var onImageSelected: (UIImage) -> Void
     
-    
+    // MARK: - Class Coordinator
     class Coordinator: NSObject, UIImagePickerControllerDelegate, UINavigationControllerDelegate {
+        
+        // MARK: Properties
         var parent: ImagePicker
         
+        // MARK: Initializer
         init(parent: ImagePicker) {
             self.parent = parent
         }
         
+        // MARK: Methods
         func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
             if let uiImage = info[.originalImage] as? UIImage {
                 parent.selectedImage = uiImage
@@ -30,6 +36,7 @@ struct ImagePicker: UIViewControllerRepresentable {
         }
     }
     
+    // MARK: - Methods
     func makeCoordinator() -> Coordinator {
         Coordinator(parent: self)
     }
@@ -41,6 +48,6 @@ struct ImagePicker: UIViewControllerRepresentable {
     }
     
     func updateUIViewController(_ uiViewController: UIImagePickerController, context: UIViewControllerRepresentableContext<ImagePicker>) {
-        // Опционально: вы можете добавить обработку обновления UI для выбранного изображения
+        /// Optional: you can add UI update processing for the selected image
     }
 }

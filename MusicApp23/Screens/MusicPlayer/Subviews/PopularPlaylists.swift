@@ -7,7 +7,6 @@
 
 import SwiftUI
 
-
 struct PopularPlaylists: View {
     
     // MARK: - Properties
@@ -36,13 +35,10 @@ struct PopularPlaylists: View {
             
             // MARK: - Playlists
             ScrollView(.horizontal, showsIndicators: false) {
-                LazyHGrid(rows: numberColumns, spacing: 12) {
+                LazyHStack {
                     ForEach(vm.popularPlaylists) { playlist in
                         NavigationLink(destination: PlaylistView(playlist: playlist)) {
                             VerPlaylistCell(playlistModel: playlist)
-                                .onAppear {
-                                    vm.playlistListens(playlist: playlist)
-                                }
                         }
                     }
                 }

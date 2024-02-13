@@ -15,6 +15,7 @@ enum AllMusicAndFavoritesTab: String, CaseIterable, Identifiable {
     var id: String { rawValue }
 }
 
+/// All Cases Enums Buttons
 var addToPlaylistTab: [AllMusicAndFavoritesTab] = AllMusicAndFavoritesTab.allCases
 
 
@@ -83,6 +84,7 @@ struct AddToPlaylistView: View {
                 }
                 .frame(width: screenSize.width, height: screenSize.height)
             }
+            .background(Color.bg)
             
             // MARK: - Botton Buttons
             HStack {
@@ -113,6 +115,7 @@ struct AddToPlaylistView: View {
             }
             .padding(.horizontal)
             .padding(.top)
+            .background(Color.bg)
         }
         
         // MARK: - NavigationBar
@@ -176,7 +179,7 @@ struct AddToPlaylistView: View {
         .padding()
         .background(
             Rectangle()
-                .fill(.black)
+                .fill(Color.bg)
                 .ignoresSafeArea()
         )
     }

@@ -15,58 +15,31 @@ struct SongMenu: View {
     // MARK: - Body
     var body: some View {
         VStack(alignment: .leading) {
-            Button {
+            
+            /// Add To Favorite Button
+            CustomeMenuButton(image: "favoriteSM", text: "Add to Favorite") {
                 vm.addToFavorites()
-            } label: {
-                HStack {
-                    Image("favoriteSM")
-                        .resizable()
-                        .aspectRatio(contentMode: .fit)
-                        .frame(width: 18)
-                        .padding(.trailing, 8)
-                        .padding(.vertical, 5)
-                    Text("Add to Favorite")
-                        .songMenuFont()
-                }
-                .padding(.horizontal, 14)
+                vm.isShowSongMenu = false
             }
             Divider()
-            Button {
+            
+            /// Add To Playlist Button
+            CustomeMenuButton(image: "playlistSM", text: "Add to Playlist") {
                 vm.isShowChoosePlaylistView = true
-            } label: {
-                HStack {
-                    Image("playlistSM")
-                        .resizable()
-                        .aspectRatio(contentMode: .fit)
-                        .frame(width: 18)
-                        .padding(.trailing, 8)
-                        .padding(.vertical, 5)
-                    Text("Add to Playlist")
-                        .songMenuFont()
-                }
-                .padding(.horizontal, 14)
-                .sheet(isPresented: $vm.isShowChoosePlaylistView) {
-                    ChoosePlaylistView()
-                        .onDisappear {
-                            vm.resetPlaylistSelection()
-                        }
-                }
+                vm.isShowSongMenu = false
+            }
+            .sheet(isPresented: $vm.isShowChoosePlaylistView) {
+                ChoosePlaylistView()
+                    .onDisappear {
+                        vm.resetPlaylistSelection()
+                    }
             }
             Divider()
-            Button {
-                // Add Action
-            } label: {
-                HStack {
-                    Image("deleteSM")
-                        .resizable()
-                        .aspectRatio(contentMode: .fit)
-                        .frame(width: 18)
-                        .padding(.trailing, 8)
-                        .padding(.vertical, 5)
-                    Text("Delete")
-                        .songMenuFont()
-                }
-                .padding(.horizontal, 14)
+            
+            /// Delete Button
+            CustomeMenuButton(image: "deleteSM", text: "Delete") {
+                /// Add Action
+                vm.isShowSongMenu = false
             }
         }
         .frame(width: 175, height: 143)
@@ -77,8 +50,10 @@ struct SongMenu: View {
 
 struct ConditionalCompactAdaptation: ViewModifier {
     
+    // MARK: Propety
     @Environment(\.horizontalSizeClass) private var horizontalSizeClass
     
+    // MARK: Method
     func body(content: Content) -> some View {
         if #available(iOS 16.4, *) {
             return content.presentationCompactAdaptation(.none)
@@ -92,4 +67,5 @@ struct ConditionalCompactAdaptation: ViewModifier {
 #Preview {
     SongMenu()
         .environmentObject(ViewModel())
+        .preferredColorScheme(.dark)
 }

@@ -15,20 +15,49 @@ struct WelcomeButtonsView: View {
     
     // MARK: - Body
     var body: some View {
-        VStack(spacing: 18) {
-            HStack(spacing: 18) {
-                WelcomButton(image: "filesW", title: "Files") { importManager.isFilesPresented.toggle() }
-                WelcomButton(image: "cameraW", title: "Camera Roll") { importManager.isPhotoPickerPresented.toggle() }
+        GeometryReader { proxy in
+            let size = proxy.size
+            VStack(spacing: 18) {
+                
+                HStack(spacing: 18) {
+                    
+                    /// Files Import
+                    WelcomButton(image: "filesW", title: "Files") {
+                        importManager.isFilesPresented.toggle()
+                    }
+                    
+                    /// Camera Roll Import
+                    WelcomButton(image: "cameraW", title: "Camera Roll") {
+//                        importManager.isPhotoPickerPresented.toggle()
+                    }
+                }
+                
+                HStack(spacing: 18) {
+                    
+                    /// App Sharing Import
+                    WelcomButton(image: "appSharingW", title: "App Sharing") {
+                        importManager.isShowShareAlert.toggle()
+                    }
+                    
+                    /// Safari Import
+                    WelcomButton(image: "safariW", title: "Safari") {
+                        importManager.isShowSafariAlert.toggle()
+                    }
+                }
+                
+                /// Wi-Fi Transfer Import
+                WelcomButton(image: "wifiW", title: "Wi-Fi Transfer") {
+                    importManager.isShowWiFiTransferSheet.toggle()
+                }
+                BottomText()
+                    .padding(.top)
             }
-            HStack(spacing: 18) {
-                WelcomButton(image: "appSharingW", title: "App Sharing") {}
-                WelcomButton(image: "safariW", title: "Safari") {}
-            }
-            WelcomButton(image: "wifiW", title: "Wi-Fi Transfer") {}
-            WelcomButton(image: "pcImportW", title: "PC Import") {}
+            .frame(height: size.height * 0.7)
         }
     }
 }
+
+
 
 #Preview {
     WelcomeButtonsView()

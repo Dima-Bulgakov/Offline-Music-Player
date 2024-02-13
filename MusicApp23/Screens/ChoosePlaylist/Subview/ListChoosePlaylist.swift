@@ -26,8 +26,8 @@ struct ListChoosePlaylist: View {
             // MARK: Image
             Image(uiImage: playlistModel.image)
                 .resizable()
-                .frame(width: 85, height: 85)
                 .scaledToFill()
+                .frame(width: 85, height: 85)
                 .cornerRadius(10)
             
             // MARK: Description
@@ -47,10 +47,7 @@ struct ListChoosePlaylist: View {
     }
 }
 
-//#Preview {
-//    ListChoosePlaylist(playlistModel: PlaylistModel(img: "playlist4",
-//                                                    name: "Music for relax",
-//                                                    count: 25,
-//                                                    songs: []))
-//    .preferredColorScheme(.dark)
-//}
+#Preview {
+    ListChoosePlaylist(playlistModel: PlaylistModel(name: "Workout", image: UIImage(imageLiteralResourceName: "testPlaylistImage"), songs: []), toggleCompletion: {})
+    .preferredColorScheme(.dark)
+}

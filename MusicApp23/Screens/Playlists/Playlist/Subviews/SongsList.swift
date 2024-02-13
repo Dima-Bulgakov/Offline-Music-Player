@@ -20,7 +20,7 @@ struct SongsList: View {
         List {
             ForEach(playlistModel.songs) { song in
                 /// Usual Mode
-                if vm.editModeInPlaylist {
+                if vm.isEditModeInPlaylistShow {
                     SongCellWithDurationAndEditMode(songModel: song) {
                         vm.isSelectedSongInPlaylists(song: song)
                     }
@@ -41,7 +41,7 @@ struct SongsList: View {
         .listStyle(InsetListStyle())
         
         // MARK: Bottom Buttons
-        if vm.editModeInPlaylist {
+        if vm.isEditModeInPlaylistShow {
             HStack {
                 ButtonForEditMode(name: "selectAll", width: 100) {
                     vm.selectSongsInPlaylist(model: playlistModel)

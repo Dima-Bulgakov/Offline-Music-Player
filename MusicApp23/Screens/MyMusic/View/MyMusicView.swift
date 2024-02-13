@@ -11,6 +11,7 @@ struct MyMusicView: View {
     
     // MARK: - Properties
     @EnvironmentObject var vm: ViewModel
+    @Environment(\.presentationMode) var presentationMode
     
     // MARK: - Body
     var body: some View {
@@ -18,8 +19,10 @@ struct MyMusicView: View {
             VStack {
                 
                 // MARK: - Subviews
-                if !vm.editModeAllMusic {
+                if !vm.isEditModeAllMusicShow {
+                    
                     AllMusicSearchBar()
+                    
                     HStack(spacing: 16) {
                         ShuffleButton()
                         SortButton()
@@ -36,22 +39,33 @@ struct MyMusicView: View {
         
         // MARK: - NavigationBar
         .customNavigationTitle(title: "My Music")
-        .customBarButton(name: vm.editModeAllMusic ? "done" : "edit", width: 32, height: 16, placement: .topBarTrailing) {
-            vm.editModeAllMusic.toggle()
-            vm.isPlayerPresented.toggle()
-            if !vm.editModeAllMusic {
-                vm.unselectSongs()
+        .customBarButton(name: vm.isEditModeAllMusicShow ? "done" : "edit", width: 32, height: 16, placement: .topBarTrailing) {
+            if !vm.allSongs.isEmpty {
+                vm.isEditModeAllMusicShow.toggle()
+                vm.isPlayerPresented.toggle()
+                if !vm.isEditModeAllMusicShow {
+                    vm.unselectSongs()
+                }
             }
+            vm.isMenuVisible = false
+            vm.searchAllMusic = ""
         }
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
-                if !vm.editModeAllMusic {
+                if !vm.isEditModeAllMusicShow {
                     ButtonForEditMode(name: "twoArrow", width: 20) {
                         vm.reverseOrder()
+                        vm.searchAllMusic = ""
+                        vm.isMenuVisible = false
                     }
                 }
             }
         }
+        .gesture(DragGesture().onEnded { value in
+            if value.translation.width > 100 {
+                presentationMode.wrappedValue.dismiss()
+            }
+        })
     }
 }
 

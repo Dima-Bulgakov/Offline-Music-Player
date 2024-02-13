@@ -20,10 +20,20 @@ struct MusicApp23App: App {
         WindowGroup {
 //            let _ = UserDefaults.standard.set(false, forKey: "_UIConstraintBasedLayoutLogUnsatisfiable")
 //            let _ = print(FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!.path)
-            ContentView()
+            ContainerView()
+//            ContentView()
                 .preferredColorScheme(isDarkMode ? .dark : .light)
                 .environmentObject(vm)
                 .environmentObject(importManager)
+                .onAppear {
+                    UserDefaults.standard.setValue(false, forKey: "_UIConstraintBasedLayoutLogUnsatisfiable")
+                    print("System Version: \(UIDevice.current.systemVersion)")
+                    print("Device: \(UIDevice.current.modelName)")
+                    print("Name: \(UIDevice.current.name)")
+                    print("Display Name: \(Bundle.main.displayName)")
+                    print("App Version: \(Bundle.main.appVersion)")
+                    print("App Build: \(Bundle.main.appBuild)")
+                }
         }
     }
 }

@@ -20,8 +20,14 @@ extension Color {
         let red = Double((rgb & 0xFF0000) >> 16) / 255.0
         let green = Double((rgb & 0x00FF00) >> 8) / 255.0
         let blue = Double(rgb & 0x0000FF) / 255.0
-
+        
         return Color(red: red, green: green, blue: blue)
+    }
+    
+    static func dynamicColor(light: String, dark: String) -> Color {
+        let isDarkMode = UIApplication.shared.windows.first?.windowScene?.traitCollection.userInterfaceStyle == .dark
+        let hex = isDarkMode ? dark : light
+        return hexToColor(hex: hex)
     }
     
     static let bg = Color.hexToColor(hex: "080705")
@@ -33,4 +39,7 @@ extension Color {
     static let timeline = Color.hexToColor(hex: "1C1B19")
     static let bunner = Color.hexToColor(hex: "0A0D10")
     static let menu = Color.hexToColor(hex: "#0F1317")
+    static let alert = Color.hexToColor(hex: "#212020")
+    static let fontScheme = dynamicColor(light: "080705", dark: "F5F5F5")
+    static let launchScreen = Color.hexToColor(hex: "#000000")
 }

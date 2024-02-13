@@ -8,6 +8,7 @@
 import SwiftUI
 
 struct ChoosePlaylistView: View {
+    
     // MARK: - Properties
     @EnvironmentObject var vm: ViewModel
     @Environment (\.dismiss) private var dismiss
@@ -15,6 +16,7 @@ struct ChoosePlaylistView: View {
     // MARK: - Body
     var body: some View {
         VStack {
+            
             // MARK: Header
             HeaderChoosePlaylist()
             
@@ -24,11 +26,13 @@ struct ChoosePlaylistView: View {
                     ListChoosePlaylist(playlistModel: pl) {
                         vm.isSelectedPlaylist(playlist: pl)
                     }
-                        .listRowSeparator(.hidden)
+                    .listRowSeparator(.hidden)
                 }
                 .listRowBackground(Color.bunner)
             }
             .listStyle(PlainListStyle())
+            
+            // MARK: Bottom Buttons
             Button {
                 vm.addSelectedSongsToPlaylists()
                 dismiss()
@@ -38,7 +42,6 @@ struct ChoosePlaylistView: View {
                     .scaledToFit()
                     .frame(width: 82)
             }
-            
         }
         .background(Color.bunner)
     }

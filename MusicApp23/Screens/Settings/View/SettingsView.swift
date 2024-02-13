@@ -12,16 +12,20 @@ struct SettingsView: View {
     // MARK: - Body
     var body: some View {
         VStack {
-            VStack {
-                
-                // MARK: - Subviews
-                Bunner()
-                SettingsList()
-                VOIOLCC()
-                Spacer()
-            }
-            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
+            GeometryReader { proxy in
+                let size = proxy.size
+                VStack {
+                    
+                    // MARK: - Subviews
+                    Bunner()
+                        .frame(height: size.height * 0.22)
+                    SettingsList()
+                    VOIOLCC()
+                    Spacer()
+                }
+                .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
             .background(Color.bg)
+            }
         }
         // MARK: - NavigationBar
         .customNavigationTitle(title: "Settings")
@@ -29,6 +33,8 @@ struct SettingsView: View {
 }
 
 #Preview {
-    SettingsView()
-        .preferredColorScheme(.dark)
+    NavigationView {
+        SettingsView()
+            .preferredColorScheme(.dark)
+    }
 }

@@ -9,9 +9,11 @@ import SwiftUI
 
 struct SongCellWithDuration: View {
     
+    // MARK: - Properties
     let songModel: SongModel
     @EnvironmentObject var vm: ViewModel
     
+    // MARK: - Body
     var body: some View {
         HStack(spacing: 14) {
             
@@ -61,7 +63,8 @@ struct SongCellWithDuration: View {
     }
 }
 
-//#Preview {
-//    SongCellWithDurationEditMode()
-//        .environmentObject(ViewModel())
-//}
+#Preview {
+    SongCellWithDuration(songModel: SongModel())
+        .environmentObject(ViewModel())
+        .preferredColorScheme(.dark)
+}

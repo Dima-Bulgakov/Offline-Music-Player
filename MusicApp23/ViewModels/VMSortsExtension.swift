@@ -10,6 +10,11 @@ import Foundation
 // MARK: - Sort`s Methods
 extension ViewModel {
     
+    /// Add Songs To MyMusicView (filteredSong
+    func myMusicSongsUpdate() {
+        filteredSongs = Array(allSongs)
+    }
+    
     /// Add Last 10 Songs To RecentlyImported Playlist
     func recentlyImportedUpdate() {
         recentlyImported = Array(allSongs.suffix(10)).reversed()
@@ -46,7 +51,6 @@ extension ViewModel {
     
     /// Methods For Counting Playlist Listens
     func playlistListens(playlist: PlaylistModel) {
-        
         if let index = allPlaylists.firstIndex(where: { $0.id == playlist.id }) {
             allPlaylists[index].numberOfListens += 1
         }

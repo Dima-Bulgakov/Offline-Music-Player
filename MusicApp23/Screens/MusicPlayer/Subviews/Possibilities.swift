@@ -22,10 +22,9 @@ struct Possibilities: View {
     let possibilities: [Possibility] = [
         Possibility(imageName: "files"),
         Possibility(imageName: "camera"),
-        Possibility(imageName: "wifi"),
-        Possibility(imageName: "pcImport"),
         Possibility(imageName: "bySharing"),
-        Possibility(imageName: "safari")
+        Possibility(imageName: "safari"),
+        Possibility(imageName: "wifi"),
     ]
     
     // MARK: - Body
@@ -57,6 +56,14 @@ struct Possibilities: View {
                                 importManager.isFilesPresented.toggle()
                             case "camera":
                                 importManager.isPhotoPickerPresented.toggle()
+                            case "bySharing": 
+                                importManager.isShowShareAlert.toggle()
+                                break
+                            case "safari":
+                                importManager.isShowSafariAlert.toggle()
+                                break
+                            case "wifi":
+                                importManager.isShowWiFiTransferSheet.toggle()
                             default:
                                 break
                             }
@@ -78,18 +85,6 @@ struct Possibilities: View {
             }
         }
         .padding(.top, 20)
-        
-        // MARK: - Import Sheets
-        /// Sheet For Import Files
-        .sheet(isPresented: self.$importManager.isFilesPresented) {
-            ImportFileManager(songs: $vm.allSongs, file: $importManager.selectedDocument, fileName: $importManager.selectedDocumentName, vm: vm)
-        }
-        /// Sheet For Import Camera's Files
-        .sheet(isPresented: $importManager.isPhotoPickerPresented) {
-            ImportCameraManager(audioPlayer: $vm.audioPlayer, vm: vm, onAudioLoaded: { songName in
-                vm.addSong(name: songName, data: Data(), artist: nil, coverImageData: nil, duration: nil)
-            })
-        }
     }
 }
 

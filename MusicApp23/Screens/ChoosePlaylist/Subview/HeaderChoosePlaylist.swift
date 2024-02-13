@@ -15,10 +15,14 @@ struct HeaderChoosePlaylist: View {
     // MARK: - Body
     var body: some View {
         HStack(alignment: .center) {
+            
+            // MARK: Title
             Text("Choose Playlist")
                 .tabBarFont()
                 .frame(maxWidth: .infinity)
         }
+        
+        // MARK: Cancel Button
         .overlay(alignment: .topLeading) {
             Button {
                 dismiss()
@@ -27,8 +31,6 @@ struct HeaderChoosePlaylist: View {
                     .resizable()
                     .aspectRatio(contentMode: .fit)
                     .frame(width: 56)
-                    .foregroundColor(.white)
-                    .font(.title)
             }
             .padding(.top, 8)
         }

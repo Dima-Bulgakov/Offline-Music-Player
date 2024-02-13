@@ -12,7 +12,7 @@ struct Bunner: View {
     // MARK: - Body
     var body: some View {
         Color.bunner
-            .frame(height: 148)
+//            .frame(height: 148)
             .frame(maxWidth: .infinity)
             .cornerRadius(16)
             .padding()

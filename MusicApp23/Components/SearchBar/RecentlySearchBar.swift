@@ -17,6 +17,8 @@ struct RecentlySearchBar: View {
     var body: some View {
         HStack {
             HStack {
+                
+                /// Text Field
                 TextField("\(magnifyingglass) Search", text: $vm.searchRecently)
                 .multilineTextAlignment(.center)
                 .accentColor(.accent)
@@ -26,6 +28,8 @@ struct RecentlySearchBar: View {
                     vm.searchSongsByArtistRecently()
                 })
             }
+            
+            /// Shape
             .overlay(
                 RoundedRectangle(cornerRadius: 10)
                     .stroke(Color.accent, lineWidth: 1)
@@ -35,4 +39,10 @@ struct RecentlySearchBar: View {
         .padding(.horizontal)
         .padding(.top)
     }
+}
+
+#Preview {
+    RecentlySearchBar()
+        .environmentObject(ViewModel())
+        .preferredColorScheme(.dark)
 }

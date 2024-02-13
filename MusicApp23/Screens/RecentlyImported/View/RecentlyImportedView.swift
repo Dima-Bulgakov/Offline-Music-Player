@@ -27,6 +27,7 @@ struct RecentlyImportedView: View {
                 }
                 .padding(.top, 14)
                 .padding(.horizontal)
+                
                 RecentlyList()
                     .padding()
             }
@@ -35,17 +36,24 @@ struct RecentlyImportedView: View {
             // MARK: - Navigation Bar
             .navigationBarBackButtonHidden(true)
             .navigationTitle("Recently Imported")
-            .customBarButton(name: "back", width: 40, height: 0, placement: .topBarLeading) {
-                dismiss() }
-            .customBarButton(name: "twoArrow", width: 25, height: 0, placement: .topBarTrailing) {
-                vm.reverseOrder() }
+            .customBarButton(name: "back", width: 40, height: 14, placement: .topBarLeading) {
+                vm.searchRecently = ""
+                dismiss()
+            }
+            .customBarButton(name: "twoArrow", width: 25, height: 21, placement: .topBarTrailing) {
+                vm.searchRecently = ""
+                vm.reverseOrder()
+            }
         }
-        .padding(.bottom, 120)
+        .padding(.bottom, 130)
+        .ignoresSafeArea(.keyboard)
     }
 }
 
 #Preview {
-    RecentlyImportedView()
-        .environmentObject(ViewModel())
+    NavigationView {
+        RecentlyImportedView()
+            .environmentObject(ViewModel())
         .preferredColorScheme(.dark)
+    }
 }

@@ -16,25 +16,38 @@ struct WelcomButton: View {
     
     // MARK: - Body
     var body: some View {
-        RoundedRectangle(cornerRadius: 20)
-            .stroke(Color.accent, lineWidth: 1)
-            .frame(height: 88)
-            .overlay(
-                VStack {
-                    Image(image)
-                        .resizable()
-                        .scaledToFit()
-                        .frame(width: 32)
-                    Text(title)
-                        .tabBarFont()
-                }
-            )
-            .onTapGesture {
-                action()
+        
+        /// Shape
+        GeometryReader { proxy in
+            let size = proxy.size
+            RoundedRectangle(cornerRadius: 20)
+                .stroke(Color.accent, lineWidth: 1)
+                .overlay(
+                    VStack {
+                        
+                        /// Image
+                        Image(image)
+                            .resizable()
+                            .scaledToFit()
+                            .frame(height: size.height * 0.35)
+                        
+                        /// Title
+                        Text(title)
+                            .font(.system(size: size.height * 0.17))
+                            .foregroundColor(Color.primaryFont)
+                            .padding(.top, 5)
+                    }
+                )
+                .frame(height: size.height * 1)
+                .onTapGesture {
+                    action()
             }
+                
+        }
     }
 }
 
-//#Preview {
-//    WelcomButton(image: "filesW", title: "Files")
-//}
+#Preview {
+    WelcomButton(image: "filesW", title: "Files") {}
+        .preferredColorScheme(.dark)
+}

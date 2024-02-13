@@ -17,7 +17,6 @@ struct AddFavorites: View {
         List {
             ForEach(vm.favoriteSongs) { song in
                 AddMusicItem(songModel: song) {
-//                    vm.isSelectedSong(song: song)
                     vm.isSelectedSongInArrays(model: song, playlist: &vm.favoriteSongs)
                 }
             }

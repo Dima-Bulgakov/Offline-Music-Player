@@ -29,12 +29,15 @@ struct SortButton: View {
             }
             .padding(.horizontal, 20)
             .frame(maxWidth: .infinity)
+            
+            /// Shape
             .overlay(
-                
                 RoundedRectangle(cornerRadius: 20)
                     .stroke(Color.accent, lineWidth: 1)
             )
         }
+        
+        /// Pop Menu With Sorting
         .popover(isPresented: $isShowSortMenu, attachmentAnchor: .point(.bottom), content: {
             SortMenu()
         })

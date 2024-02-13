@@ -74,8 +74,7 @@ struct Head: View {
                     // MARK: Alert For Edit Playlist's Name
                     .alert("Edit Your Name", isPresented: $isEditing) {
                         TextField(editedName, text: $editedName)
-                            .foregroundColor(.black)
-                        
+                            .foregroundColor(.fontScheme)
                         Button("Cancel", role: .cancel, action: {})
                         Button("Save",action: {
                             if let index = vm.allPlaylists.firstIndex(where: { $0.id == playlistModel.id }) {
@@ -86,6 +85,7 @@ struct Head: View {
                     } message: {
                         Text("Please Enter your name to edit.")
                     }
+                    
                     // MARK: Name Of Playlist
                     Text(playlistModel.name)
                         .titleFont()

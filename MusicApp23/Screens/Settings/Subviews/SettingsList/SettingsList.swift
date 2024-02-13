@@ -9,7 +9,7 @@ import SwiftUI
 
 struct SettingsList: View {
     
-    // MARK: - Model
+    // MARK: - Model For Cell
     struct SettingItem: Identifiable {
         let id = UUID()
         let image: String
@@ -18,31 +18,41 @@ struct SettingsList: View {
     }
     
     // MARK: - Property
-    @State private var isShowingEmailSheet = false // Переменная состояния для управления отображением Sheet
     
+    /// Array With Settings Cells
     var settingsArray: [SettingItem] {
         [
             SettingItem(image: "report", title: "Report Bug") {
-                isShowingEmailSheet.toggle()
+                email.send(openURL: openURL)
             },
             SettingItem(image: "rate", title: "Rate Us") {
-                
+                /// Link To App Store
             },
             SettingItem(image: "share", title: "Share App") {
-                // Действие для нажатия на "Share App"
+                isSharing.toggle()
             },
             SettingItem(image: "privacy", title: "Privacy Policy") {
-                // Действие для нажатия на "Privacy Policy"
+                /// Show Privacy Policy Action
             },
             SettingItem(image: "terms", title: "Terms of Use") {
-                // Действие для нажатия на "Terms of Use"
+                /// Show Terms Of Use Action
             }
         ]
     }
     
+    /// Email Properties
+    @Environment(\.openURL) var openURL
+    private var email = SupportEmail(toAddress: "voio@gmail.com",
+                                     subject: "Support Email",
+                                     messageHeader: "Please describe your issue below")
+    /// Share Properties
+    @State private var isSharing = false
+    
     // MARK: - Body
     var body: some View {
         VStack {
+            
+            // MARK: List Of Settings Cell
             List {
                 ForEach(settingsArray) { item in
                     SettingListCell(image: item.image, title: item.title, action: item.action)
@@ -51,39 +61,12 @@ struct SettingsList: View {
             }
             .listStyle(.plain)
             .frame(height: 330)
-            .sheet(isPresented: $isShowingEmailSheet) {
-                EmailComposeSheet(isPresented: $isShowingEmailSheet)
+            
+            // MARK: Sheets
+            .sheet(isPresented: $isSharing) {
+                ShareSheet(activityItems: [URL(string: "https://MusicApp23.com")!], applicationActivities: nil)
             }
         }
-    }
-}
-
-import MessageUI
-
-struct EmailComposeSheet: UIViewControllerRepresentable {
-    @Binding var isPresented: Bool
-    
-    class Coordinator: NSObject, MFMailComposeViewControllerDelegate {
-        func mailComposeController(_ controller: MFMailComposeViewController, didFinishWith result: MFMailComposeResult, error: Error?) {
-            controller.dismiss(animated: true)
-        }
-    }
-    
-    func makeCoordinator() -> Coordinator {
-        return Coordinator()
-    }
-    
-    func makeUIViewController(context: Context) -> MFMailComposeViewController {
-        let mailComposer = MFMailComposeViewController()
-        mailComposer.mailComposeDelegate = context.coordinator
-        mailComposer.setToRecipients(["voiosupport@gmail.com"])
-        mailComposer.setSubject("Report Bug")
-        mailComposer.setMessageBody("Tell us about an issue:", isHTML: false)
-        return mailComposer
-    }
-    
-    func updateUIViewController(_ uiViewController: MFMailComposeViewController, context: Context) {
-        // Update UI if needed
     }
 }
 

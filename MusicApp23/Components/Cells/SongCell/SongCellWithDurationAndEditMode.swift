@@ -74,8 +74,8 @@ struct SongCellWithDurationAndEditMode: View {
     }
 }
 
-//#Preview {
-//    SongCellSelectionAndDuration(songModel: SongModel())
-//        .environmentObject(ViewModel())
-//        .preferredColorScheme(.dark)
-//}
+#Preview {
+    SongCellWithDurationAndEditMode(songModel: SongModel(), toggleCompletion: {})
+        .environmentObject(ViewModel())
+        .preferredColorScheme(.dark)
+}

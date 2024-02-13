@@ -13,7 +13,7 @@ struct BottomText: View {
     var body: some View {
         Text("Please import music \nto starting use the app")
             .descriptionFont()
-            .padding(.top, 30)
+            .multilineTextAlignment(.center)
     }
 }
 

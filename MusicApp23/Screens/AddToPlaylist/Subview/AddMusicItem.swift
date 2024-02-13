@@ -76,8 +76,8 @@ struct AddMusicItem: View {
     }
 }
 
-//#Preview {
-//    AddAllMusicItem(songModel: SongModel())
-//        .environmentObject(ViewModel())
-//        .preferredColorScheme(.dark)
-//}
+#Preview {
+    AddMusicItem(songModel: SongModel(), toggleCompletion: {})
+        .environmentObject(ViewModel())
+        .preferredColorScheme(.dark)
+}

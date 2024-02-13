@@ -11,7 +11,7 @@ struct MainMenuView: View {
     
     // MARK: Properties
     @Binding var selectedView: Int
-    @Binding var isMenuVisible: Bool
+    @EnvironmentObject var vm: ViewModel
     
     // MARK: Body
     var body: some View {
@@ -20,25 +20,25 @@ struct MainMenuView: View {
                 MenuItem(image: "home", title: "Home", isSelected: selectedView == 1)
                     .onTapGesture {
                         selectedView = 1
-                        isMenuVisible.toggle()
+                        vm.isMenuVisible.toggle()
                     }
                 Divider()
                 MenuItem(image: "myMusic", title: "My Music", isSelected: selectedView == 2)
                     .onTapGesture {
                         selectedView = 2
-                        isMenuVisible.toggle()
+                        vm.isMenuVisible.toggle()
                     }
                 Divider()
                 MenuItem(image: "playlists", title: "Playlists", isSelected: selectedView == 3)
                     .onTapGesture {
                         selectedView = 3
-                        isMenuVisible.toggle()
+                        vm.isMenuVisible.toggle()
                     }
                 Divider()
                 MenuItem(image: "settings", title: "Settings", isSelected: selectedView == 4)
                     .onTapGesture {
                         selectedView = 4
-                        isMenuVisible.toggle()
+                        vm.isMenuVisible.toggle()
                     }
             }
             .padding()
@@ -52,6 +52,7 @@ struct MainMenuView: View {
 }
 
 #Preview {
-    MainMenuView(selectedView: .constant(1), isMenuVisible: .constant(true))
+    MainMenuView(selectedView: .constant(1))
+        .environmentObject(ViewModel())
         .preferredColorScheme(.dark)
 }

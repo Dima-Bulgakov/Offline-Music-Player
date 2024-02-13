@@ -23,10 +23,9 @@ struct MusicPlayerView: View {
                 Possibilities()
                 
                 Spacer()
-                
+
                 if vm.allSongs.isEmpty {
                     VStack {
-                        Spacer(minLength: 150)
                         NoSongs()
                     }
                     .frame(maxWidth: .infinity)
@@ -40,9 +39,10 @@ struct MusicPlayerView: View {
                 }
                 Spacer()
             }
-            .customBarButton(name: "magnifyingglass", width: 19, height: 19, placement: .topBarTrailing) {  }
         }
-        .padding(.bottom, 130)
+        .background(Color.bg)
+        .padding(.bottom, 140)
+        .customNavigationTitle(title: "Music Player")
     }
 }
 

@@ -11,6 +11,7 @@ struct VerPlaylistCell: View {
     
     // MARK: - Properties
     let playlistModel: PlaylistModel
+    @EnvironmentObject var vm: ViewModel
     
     // MARK: - Body
     var body: some View {
@@ -43,6 +44,10 @@ struct VerPlaylistCell: View {
             Text("\(playlistModel.count) Songs")
                 .descriptionFont()
                 .foregroundStyle(Color.secondaryFont)
+        }
+        .onAppear {
+            vm.playlistListens(playlist: playlistModel)
+            print("Number of Listens for \(playlistModel.name): \(playlistModel.numberOfListens)")
         }
         .listRowBackground(Color.bg)
     }

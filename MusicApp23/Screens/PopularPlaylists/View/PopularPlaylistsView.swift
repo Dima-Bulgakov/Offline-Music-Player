@@ -9,8 +9,10 @@ import SwiftUI
 
 struct PopularPlaylistsView: View {
     
+    // MARK: - Properties
     @Environment (\.dismiss) private var dismiss
     
+    // MARK: - Body
     var body: some View {
         VStack {
             VStack {
@@ -19,7 +21,10 @@ struct PopularPlaylistsView: View {
             .background(Color.bg)
             .navigationBarBackButtonHidden(true)
             .navigationTitle("Popular Playlists")
-            .customBarButton(name: "back", width: 40, height: 0, placement: .topBarLeading) { dismiss() }
+            .customBarButton(name: "back", width: 40, height: 14, placement: .topBarLeading) {
+                dismiss()
+            }
+            .padding(.bottom, 140)
         }
     }
 }

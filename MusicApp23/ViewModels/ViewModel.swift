@@ -9,36 +9,42 @@ import SwiftUI
 import AVFAudio
 import RealmSwift
 
-
 final class ViewModel: NSObject, ObservableObject {
     
     // MARK: - Properties
+    
+    /// Menu Mode
+    @Published var isMenuVisible: Bool = false
+    @Published var isShowSongMenu = false
+    
     /// Edit Mode
-    @Published var editModeFavorite: Bool = false
-    @Published var editModeAllMusic: Bool = false
-    @Published var editModeInPlaylist: Bool = false
-    @Published var editModePlaylists: Bool = false
+    @Published var isEditModeFavoriteShow: Bool = false
+    @Published var isEditModeAllMusicShow: Bool = false
+    @Published var isEditModeInPlaylistShow: Bool = false
+    @Published var isEditModePlaylistsShow: Bool = false
     @Published var isPlayerPresented: Bool = true
     
     /// Player
     @Published var audioPlayer: AVAudioPlayer?
-    @Published var isPlaying = false
-    @Published var isShuffle: Bool = false
     @Published var currentSong: SongModel? = nil
     @Published var currentSongIndex: Int? = nil
     @Published var currentTime: TimeInterval = 0.0
     @Published var totalTime: TimeInterval = 0.0
+    @Published var isPlaying = false
+    @Published var isShuffle: Bool = false
     @Published var isRepeat: Bool = false
     
     /// Searching
     @Published var searchAllMusic = ""
     @Published var searchRecently = ""
+    @Published var filteredSongs: [SongModel] = []
     
     /// DataBase
     @ObservedResults(SongModel.self) var songData
     @Published var allSongs: [SongModel] = [] {
         didSet {
             recentlyImportedUpdate()
+            myMusicSongsUpdate()
         }
     }
     @Published var originalSongsOrder: [SongModel] = []
@@ -58,6 +64,9 @@ final class ViewModel: NSObject, ObservableObject {
     @Published var isShowAddToPlaylistView = false
     @Published var isShowChoosePlaylistView = false
     
+    /// Lock Screen
+    private let audioSession = AVAudioSession.sharedInstance()
+    
     // MARK: - Initializer
     override init() {
         super.init()
@@ -65,6 +74,18 @@ final class ViewModel: NSObject, ObservableObject {
         originalSongsOrder = allSongs
         originalSongsOrderRecently = recentlyImported
         popularPlaylists = allPlaylists
+        
+        do {
+            try AVAudioSession.sharedInstance().setCategory(.playback)
+            try AVAudioSession.sharedInstance().setActive(true)
+        } catch {
+            print("Failed to configure audio session:", error.localizedDescription)
+        }
+               
+        try! self.audioSession.setActive(true)
+        
+        setupRemoteTransportControls()
+//        setupNowPlaying()
     }
     
     // MARK: - Realm Methods
@@ -92,38 +113,13 @@ final class ViewModel: NSObject, ObservableObject {
             let realm = try Realm()
             try realm.write {
                 let songsToDelete = indices.compactMap { $0 < allSongs.count ? allSongs[$0] : nil }
-                
-                // Избегаем использования удаленных объектов
-                for song in songsToDelete {
-                    if let index = allSongs.firstIndex(of: song) {
-                        allSongs.remove(at: index)
-                    }
-                }
-                
                 realm.delete(songsToDelete)
-                
-                // Очищаем currentSong и currentSongIndex, если они указывают на удаленную песню
-                if let currentSong = currentSong, let index = allSongs.firstIndex(of: currentSong), songsToDelete.contains(currentSong) {
-                    self.currentSong = nil
-                    self.currentSongIndex = nil
-                }
+                allSongs = Array(realm.objects(SongModel.self))
             }
         } catch {
             print("Error deleting song: \(error.localizedDescription)")
         }
     }
-//    func deleteSong(at indices: IndexSet) {
-//        do {
-//            let realm = try Realm()
-//            try realm.write {
-//                let songsToDelete = indices.compactMap { $0 < allSongs.count ? allSongs[$0] : nil }
-//                realm.delete(songsToDelete)
-//                allSongs = Array(realm.objects(SongModel.self))
-//            }
-//        } catch {
-//            print("Error deleting song: \(error.localizedDescription)")
-//        }
-//    }
     
     // TODO: Add Realm To This Method
     func addToFavorites() {
@@ -136,11 +132,11 @@ final class ViewModel: NSObject, ObservableObject {
     // MARK: - Searching Method
     func searchSongsByArtist() {
         guard !searchAllMusic.isEmpty else {
-            allSongs = originalSongsOrder
+            filteredSongs = originalSongsOrder
             return
         }
         
-        allSongs = originalSongsOrder.filter { song in
+        filteredSongs = originalSongsOrder.filter { song in
             if let artist = song.artist {
                 return artist.localizedCaseInsensitiveContains(searchAllMusic)
             } else {
@@ -148,7 +144,7 @@ final class ViewModel: NSObject, ObservableObject {
             }
         }
     }
-    
+
     func searchSongsByArtistRecently() {
         guard !searchRecently.isEmpty else {
             recentlyImported = originalSongsOrderRecently
@@ -163,8 +159,6 @@ final class ViewModel: NSObject, ObservableObject {
             }
         }
     }
-    
-
 
     // MARK: - Playlist Methods
     func isSelectedPlaylist(playlist: PlaylistModel) {
@@ -273,5 +267,3 @@ final class ViewModel: NSObject, ObservableObject {
         favoriteSongs.removeAll { $0.isSelected }
     } 
 }
-
-

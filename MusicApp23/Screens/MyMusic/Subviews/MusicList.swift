@@ -18,27 +18,32 @@ struct MusicList: View {
             
             // MARK: List Of All Songs
             List {
-                ForEach(vm.allSongs) { song in
-                    if vm.editModeAllMusic {
+                ForEach(vm.filteredSongs) { song in
+                    if vm.isEditModeAllMusicShow {
                         SongCellWithDurationAndEditMode(songModel: song) {
                             vm.isSelectedSongInArrays(model: song, playlist: &vm.allSongs)
                         }
+                        .listRowBackground(Color.bg)
                     } else {
                         SongCellWithDuration(songModel: song)
                             .onTapGesture {
                                 vm.playAudio(data: song.data, playlist: vm.allSongs)
                                 vm.setCurrentSong(song, index: vm.allSongs.firstIndex(of: song))
                             }
+                            .listRowBackground(Color.bg)
                     }
+                    
                 }
                 .onDelete(perform: vm.deleteSong)
                 .listRowSeparator(.hidden)
             }
             .listStyle(.plain)
-            .padding(.bottom, vm.editModeAllMusic ? 0 : 130)
+            .padding(.bottom, vm.isEditModeAllMusicShow ? 0 : 140)
+            .ignoresSafeArea(.keyboard)
+            
             
             // MARK: Bottom Buttons For Edit Mode
-            if vm.editModeAllMusic  {
+            if vm.isEditModeAllMusicShow  {
                 HStack {
                     ButtonForEditMode(name: "selectAll", width: 100) {
                         vm.selectAllSongs()

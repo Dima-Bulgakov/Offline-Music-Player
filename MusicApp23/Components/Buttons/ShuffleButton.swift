@@ -14,7 +14,6 @@ struct ShuffleButton: View {
     
     // MARK: - Body
     var body: some View {
-        
         Button {
             vm.shuffleSongs()
         } label: {
@@ -31,8 +30,9 @@ struct ShuffleButton: View {
             }
             .padding(.horizontal, 20)
             .frame(maxWidth: .infinity)
+            
+            /// Shape
             .overlay(
-                
                 RoundedRectangle(cornerRadius: 20)
                     .stroke(Color.accent, lineWidth: 1)
             )
