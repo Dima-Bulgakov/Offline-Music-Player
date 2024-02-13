@@ -8,8 +8,9 @@
 import UIKit
 import SwiftUI
 
+// MARK: - Alert For Additing Playlists
 extension UIAlertController {
-    static func customTextFieldAlert(completion: @escaping (String) -> Void, saveAction: @escaping () -> Void) -> UIAlertController {
+    static func customTextFieldAlert(completion: @escaping (String?) -> Void, saveAction: @escaping () -> Void) -> UIAlertController {
         let alert = UIAlertController(title: "Enter a new playlist name", message: "", preferredStyle: .alert)
         alert.addTextField { textField in
             textField.placeholder = "Playlist Name"
@@ -21,7 +22,10 @@ extension UIAlertController {
             saveAction() // убедитесь, что вызывается saveActionHandler
         }
         
-        let cancelAction = UIAlertAction(title: "Cancel", style: .destructive)
+        let cancelAction = UIAlertAction(title: "Cancel", style: .destructive) { _ in
+            // Обработка нажатия кнопки "Cancel"
+            // В данном случае, просто закрываем Alert без выполнения дополнительных действий
+        }
         
         alert.addAction(cancelAction)
         alert.addAction(saveAction)
@@ -30,12 +34,16 @@ extension UIAlertController {
     }
 }
 
+
 extension View {
-    func alertView(myPlaylists: Binding<[PlaylistModel]>, saveActionHandler: @escaping () -> Void) {
+    func alertAddPlaylist(myPlaylists: Binding<[PlaylistModel]>, saveActionHandler: @escaping () -> Void) {
         let alertController = UIAlertController.customTextFieldAlert { playlistName in
 
-            let newPlaylist = PlaylistModel(name: playlistName, image: UIImage(imageLiteralResourceName: "noImagePlaylist"), songs: [])
-            myPlaylists.wrappedValue.append(newPlaylist)
+            if let name = playlistName {
+                let newPlaylist = PlaylistModel(name: name, image: UIImage(imageLiteralResourceName: "noImagePlaylist"), songs: [])
+                myPlaylists.wrappedValue.append(newPlaylist)
+            }
+            
 
         } saveAction: {
             saveActionHandler()
