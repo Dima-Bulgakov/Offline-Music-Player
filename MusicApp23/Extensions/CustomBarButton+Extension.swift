@@ -7,6 +7,7 @@
 
 import SwiftUI
 
+
 extension View {
     func customBarButton(name: String, width: CGFloat, height: CGFloat, placement: ToolbarItemPlacement, action: @escaping () -> Void) -> some View {
         toolbar {
@@ -16,6 +17,7 @@ extension View {
                         .resizable()
                         .scaledToFill()
                         .frame(width: width, height: height)
+                        .foregroundColor(Color.accent)
                 }
             }
         }

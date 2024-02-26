@@ -5,7 +5,9 @@
 //  Created by Dima on 22.12.2023.
 //
 
+
 import SwiftUI
+
 
 struct VOIOLCC: View {
     
@@ -17,9 +19,4 @@ struct VOIOLCC: View {
             .frame(width: 81)
             .padding(.top, 20)
     }
-}
-
-#Preview {
-    VOIOLCC()
-        .preferredColorScheme(.dark)
 }

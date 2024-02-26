@@ -7,6 +7,7 @@
 
 import SwiftUI
 
+
 extension View {
     func customNavigationTitle(title: String) -> some View {
         self

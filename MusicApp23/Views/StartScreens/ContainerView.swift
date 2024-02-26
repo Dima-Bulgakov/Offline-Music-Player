@@ -9,8 +9,10 @@ import SwiftUI
 
 struct ContainerView: View {
     
+    // MARK: - Properties
     @State private var isLaunchScreenViewPresented = true
     
+    // MARK: - Body
     var body: some View {
         if !isLaunchScreenViewPresented {
             ContentView()
@@ -20,9 +22,12 @@ struct ContainerView: View {
     }
 }
 
+
+// MARK: - Preview
 #Preview {
     ContainerView()
-        .environmentObject(ViewModel())
-        .environmentObject(VMImportManager())
+        .environmentObject(ViewModel(realmManager: RealmManager(name: "realm")))
+        .environmentObject(RealmManager(name: "viewModel"))
+        .environmentObject(ImportManager())
         .preferredColorScheme(.dark)
 }

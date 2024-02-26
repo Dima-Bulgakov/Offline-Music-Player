@@ -7,6 +7,7 @@
 
 import SwiftUI
 
+
 struct HeaderViewWiFiTransfer: View {
     
     // MARK: - Properties
@@ -16,6 +17,7 @@ struct HeaderViewWiFiTransfer: View {
     // MARK: - Body
     var body: some View {
         HStack(alignment: .center) {
+            
             /// Title
             Text(title)
                 .tabBarFont()
@@ -36,7 +38,3 @@ struct HeaderViewWiFiTransfer: View {
         }
     }
 }
-
-//#Preview {
-//    HeaderViewWiFiTransfer()
-//}

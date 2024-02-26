@@ -6,10 +6,14 @@
 //
 
 import SwiftUI
+import RealmSwift
+
 
 struct HorPlaylistCellWithEditMode: View {
     // MARK: - Properties
-    let playlistModel: PlaylistModel
+    @EnvironmentObject var vm: ViewModel
+    @ObservedRealmObject var playlist: Playlist
+    
     let toggleCompletion: () -> Void
     
     // MARK: - Body
@@ -17,25 +21,36 @@ struct HorPlaylistCellWithEditMode: View {
         HStack(spacing: 14) {
             
             // MARK: Toggle
-            Image(playlistModel.isSelected ? "select" : "unselect")
+            Image(systemName: vm.selectedPlaylists.contains(playlist.id) ? "circle.inset.filled" : "circle")
                 .resizable()
                 .scaledToFit()
                 .frame(width: 20, height: 20)
                 .padding(.leading)
+                .foregroundColor(Color.accent)
             
             // MARK: Image
-            Image(uiImage: playlistModel.image)
-                .resizable()
-                .scaledToFill()
-                .frame(width: 85, height: 85)
-                .cornerRadius(10)
+            if let coverImageData = playlist.image, let uiImage = UIImage(data: coverImageData) {
+                Image(uiImage: uiImage)
+                    .resizable()
+                    .scaledToFill()
+                    .frame(width: 85, height: 85)
+                    .cornerRadius(10)
+            } else {
+                ZStack {
+                    Image("noImagePlaylist")
+                        .resizable()
+                        .scaledToFill()
+                        .frame(width: 85, height: 85)
+                        .cornerRadius(10)
+                }
+            }
             
             // MARK: Description
             VStack(alignment: .leading) {
-                Text(playlistModel.name)
+                Text(playlist.name)
                     .nameFont()
                     .foregroundStyle(Color.white)
-                Text("\(playlistModel.count) Songs")
+                Text("\(playlist.count) Songs")
                     .font(.system(size: 14))
                     .descriptionFont()
             }
@@ -45,9 +60,4 @@ struct HorPlaylistCellWithEditMode: View {
             toggleCompletion()
         }
     }
-}
-
-#Preview {
-    HorPlaylistCellWithEditMode(playlistModel: PlaylistModel(name: "Workout", image: UIImage(imageLiteralResourceName: "playlist4"), songs: []), toggleCompletion: {})
-        .preferredColorScheme(.dark)
 }

@@ -7,42 +7,53 @@
 
 import SwiftUI
 
-struct RecentlySearchBar: View {
+
+struct RecentlyMusicSearchBar: View {
     
     // MARK: - Properties
     @EnvironmentObject var vm: ViewModel
+    @State private var isFocused: Bool = false
+    
     let magnifyingglass = Image(systemName: "magnifyingglass")
     
     // MARK: - Body
     var body: some View {
         HStack {
             HStack {
+                Image(systemName: "magnifyingglass")
+                    .font(.subheadline)
+                    .foregroundColor(.white)
                 
-                /// Text Field
-                TextField("\(magnifyingglass) Search", text: $vm.searchRecently)
-                .multilineTextAlignment(.center)
-                .accentColor(.accent)
-                .colorMultiply(.white)
-                .padding(8)
-                .onChange(of: vm.searchRecently, perform: { _ in
-                    vm.searchSongsByArtistRecently()
-                })
+                /// TextField
+                TextField("Search", text: $vm.searchRecently)
+                    .multilineTextAlignment(.leading)
+                    .accentColor(.white)
+                    .foregroundColor(.white)
+                    .padding(8)
             }
-            
-            /// Shape
+            .padding(.leading)
+            .frame(height: 36)
+            .background(Color.accent.opacity(0.2))
+            .cornerRadius(10)
             .overlay(
                 RoundedRectangle(cornerRadius: 10)
-                    .stroke(Color.accent, lineWidth: 1)
+                    .stroke(isFocused ? Color.accent : Color.clear, lineWidth: 1)
             )
-            .frame(minHeight: 36, maxHeight: 36)
         }
         .padding(.horizontal)
         .padding(.top)
+        .onTapGesture {
+            self.isFocused = true
+        }
     }
 }
 
+
+// MARK: - Preview
 #Preview {
-    RecentlySearchBar()
-        .environmentObject(ViewModel())
+    RecentlyMusicSearchBar()
+        .environmentObject(ViewModel(realmManager: RealmManager(name: "realm")))
+        .environmentObject(RealmManager(name: "viewModel"))
+        .environmentObject(ImportManager())
         .preferredColorScheme(.dark)
 }

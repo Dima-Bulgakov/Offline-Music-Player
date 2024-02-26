@@ -6,18 +6,21 @@
 //
 
 import SwiftUI
+import RealmSwift
+
 
 struct ContentView: View {
     
     // MARK: - Properties
     @EnvironmentObject var vm: ViewModel
-    @EnvironmentObject var importManager: VMImportManager
+    @EnvironmentObject var rm: RealmManager
+    @EnvironmentObject var importManager: ImportManager
     
     // MARK: - Body
     var body: some View {
         ZStack(alignment: .bottom) {
             
-            // MARK: - All Views
+            // MARK: - Main Menu With All Views
             MainMenu()
                 .zIndex(1)
             
@@ -35,43 +38,38 @@ struct ContentView: View {
                 }
             }
         }
-        .ignoresSafeArea(.keyboard) 
+        .ignoresSafeArea(.keyboard)
         
-        // MARK: - Import Sheets And Alerts
-        /// Sheet For Import Files
+        // MARK: - Import Sheets
+        /// Files
         .sheet(isPresented: self.$importManager.isFilesPresented) {
-            ImportFileManager(songs: $vm.allSongs, file: $importManager.selectedDocument, fileName: $importManager.selectedDocumentName, vm: vm)
+            ImportFileManager(file: $importManager.selectedDocument, fileName: $importManager.selectedDocumentName, vm: vm, rm: rm)
         }
-        /// Sheet For Import Camera's Files
+        /// Safari
+        .sheet(isPresented: self.$importManager.isShowSafariAlert, content: {
+            SafariSheetView()
+        })
+        /// Share
+        .sheet(isPresented: self.$importManager.isShowShareAlert, content: {
+            ShareSheetView()
+        })
+        /// Camera
         .sheet(isPresented: $importManager.isPhotoPickerPresented) {
-                    ImportCameraManager(audioPlayer: $vm.audioPlayer, vm: vm)
-                }
+            ImportCameraManager(audioPlayer: $vm.audioPlayer, vm: vm)
+        }
+        /// Wi-Fi Transfer
         .sheet(isPresented: $importManager.isShowWiFiTransferSheet) {
             WiFiTransferView()
         }
-        .overlay(
-            Group {
-                /// Alert For Share Import
-                if importManager.isShowShareAlert {
-                    AlertForPossibilities(title: .share, image: "shareAlert") {
-                        importManager.isShowShareAlert.toggle()
-                    }
-                    .transition(.scale)
-                    /// Alert For Safari Import
-                } else if importManager.isShowSafariAlert {
-                    AlertForPossibilities(title: .safari, image: "DeathStar") {
-                        importManager.isShowSafariAlert.toggle()
-                    }
-                    .transition(.scale)
-                }
-            }
-        )
     }
 }
 
+
+// MARK: - Preview
 #Preview {
     ContentView()
-        .environmentObject(ViewModel())
-        .environmentObject(VMImportManager())
+        .environmentObject(ViewModel(realmManager: RealmManager(name: "realm")))
+        .environmentObject(RealmManager(name: "viewModel"))
+        .environmentObject(ImportManager())
         .preferredColorScheme(.dark)
 }

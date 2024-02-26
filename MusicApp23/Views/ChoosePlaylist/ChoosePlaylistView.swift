@@ -7,11 +7,13 @@
 
 import SwiftUI
 
+
 struct ChoosePlaylistView: View {
     
     // MARK: - Properties
     @EnvironmentObject var vm: ViewModel
     @EnvironmentObject var rm: RealmManager
+    
     @Environment (\.dismiss) private var dismiss
     
     // MARK: - Body
@@ -21,7 +23,7 @@ struct ChoosePlaylistView: View {
             // MARK: Header
             HeaderChoosePlaylist()
             
-            // MARK: Playlists
+            // MARK: List Of Playlists
             List {
                 ForEach(rm.playlistsArray) { playlist in
                     HorPlaylistCellWithEditMode(playlist: playlist) {
@@ -33,7 +35,7 @@ struct ChoosePlaylistView: View {
             }
             .listStyle(PlainListStyle())
             
-            // MARK: Add To Buttons
+            // MARK: "Add To" Button
             Button {
                 vm.addSelectedSongToPlaylist()
                 dismiss()
@@ -50,6 +52,7 @@ struct ChoosePlaylistView: View {
 }
 
 
+// MARK: - Preview
 #Preview {
     ChoosePlaylistView()
         .environmentObject(ViewModel(realmManager: RealmManager(name: "realm")))

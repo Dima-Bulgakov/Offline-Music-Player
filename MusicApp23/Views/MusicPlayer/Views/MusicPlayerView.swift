@@ -13,6 +13,7 @@ struct MusicPlayerView: View {
     
     // MARK: - Properties
     @EnvironmentObject var vm: ViewModel
+    @EnvironmentObject var rm: RealmManager
     
     // MARK: - Body
     var body: some View {
@@ -20,39 +21,36 @@ struct MusicPlayerView: View {
             VStack {
                 
                 // MARK: - Subviews
-                Possibilities()
-                
-                Spacer()
-
-                if vm.allSongs.isEmpty {
-                    VStack {
-                        NoSongs()
-                    }
-                    .frame(maxWidth: .infinity)
+                PossibilitiesPreview()
+                if let isNotEmpty = rm.songs?.isEmpty, isNotEmpty {
+                    NoSongs()
+                        .offset(y: -40)
                 } else {
-                    RecentlyImported()
-                    if !vm.popularPlaylists.isEmpty {
-                        PopularPlaylists()
+                    RecentlyImportedPreview()
+                    if !rm.playlistsArray.isEmpty {
+                        PopularPlaylistsPreview()
                     }
-                    
-                    AllMusic()
+                    AllMusicPreview()
                 }
                 Spacer()
             }
         }
         .background(Color.bg)
         .padding(.bottom, 140)
+        
+        // MARK: - Navigation Bar
         .customNavigationTitle(title: "Music Player")
     }
 }
 
 
+// MARK: - Preview
 #Preview {
     NavigationView {
         MusicPlayerView()
-            .environmentObject(ViewModel())
-            .environmentObject(VMImportManager())
+            .environmentObject(ViewModel(realmManager: RealmManager(name: "realm")))
+            .environmentObject(RealmManager(name: "viewModel"))
+            .environmentObject(ImportManager())
             .preferredColorScheme(.dark)
     }
 }
-

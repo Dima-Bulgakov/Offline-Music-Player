@@ -6,31 +6,27 @@
 //
 
 import SwiftUI
+import RealmSwift
+
 
 struct PopularPlaylistsList: View {
     
     // MARK: - Properties
     @EnvironmentObject var vm: ViewModel
+    @EnvironmentObject var rm: RealmManager
+    @ObservedResults(Playlist.self, filter: NSPredicate(format: "name != %@", "Favorite")) var playlists
     
     // MARK: - Body
     var body: some View {
         List {
-            ForEach(vm.popularPlaylists) { playlist in
+            ForEach(playlists) { playlist in
                 NavigationLink(destination: PlaylistView(playlist: playlist)) {
-                    HorPlaylistCell(playlistModel: playlist)
-//                        .onAppear {
-//                            vm.playlistListens(playlist: playlist)
-//                        }
+                    HorPlaylistCell(playlist: playlist)
                 }
             }
+            .listRowBackground(Color.bg)
             .listRowSeparator(.hidden)
         }
         .listStyle(PlainListStyle())
     }
-}
-
-#Preview {
-    PopularPlaylistsList()
-        .environmentObject(ViewModel())
-        .preferredColorScheme(.dark)
 }

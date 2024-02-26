@@ -7,6 +7,7 @@
 
 import SwiftUI
 
+
 struct HeaderChoosePlaylist: View {
     
     // MARK: - Properties
@@ -40,6 +41,7 @@ struct HeaderChoosePlaylist: View {
 }
 
 
+// MARK: - Preview
 #Preview {
     HeaderChoosePlaylist()
 }

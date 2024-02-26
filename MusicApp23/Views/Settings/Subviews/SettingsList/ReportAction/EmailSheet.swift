@@ -7,6 +7,7 @@
 
 import SwiftUI
 
+
 // MARK: - Sheet For Sending Email in Settings
 struct SupportEmail {
     let toAddress: String
@@ -41,9 +42,9 @@ struct SupportEmail {
 
 extension UIDevice {
     var modelName: String {
-        #if targetEnvironment(simulator)
+#if targetEnvironment(simulator)
         let identifier = ProcessInfo().environment["SIMULATOR_MODEL_IDENTIFIER"]!
-        #else
+#else
         var systemInfo = utsname()
         uname(&systemInfo)
         let machineMirror = Mirror(reflecting: systemInfo.machine)
@@ -51,7 +52,7 @@ extension UIDevice {
             guard let value = element.value as? Int8, value != 0 else { return identifier }
             return identifier + String(UnicodeScalar(UInt8(value)))
         }
-        #endif
+#endif
         return identifier
     }
 }

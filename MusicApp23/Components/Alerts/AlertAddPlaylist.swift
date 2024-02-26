@@ -8,6 +8,7 @@
 import UIKit
 import SwiftUI
 
+
 // MARK: - Alert For Additing Playlists
 extension UIAlertController {
     static func customTextFieldAlert(completion: @escaping (String?) -> Void, saveAction: @escaping () -> Void) -> UIAlertController {
@@ -19,12 +20,10 @@ extension UIAlertController {
         let saveAction = UIAlertAction(title: "Save", style: .default) { _ in
             guard let text = alert.textFields?.first?.text else { return }
             completion(text)
-            saveAction() // убедитесь, что вызывается saveActionHandler
+            saveAction()
         }
         
         let cancelAction = UIAlertAction(title: "Cancel", style: .destructive) { _ in
-            // Обработка нажатия кнопки "Cancel"
-            // В данном случае, просто закрываем Alert без выполнения дополнительных действий
         }
         
         alert.addAction(cancelAction)
@@ -34,25 +33,32 @@ extension UIAlertController {
     }
 }
 
-
+// MARK: - Extension For View To Show Alert For Adding Playlist
 extension View {
-    func alertAddPlaylist(myPlaylists: Binding<[PlaylistModel]>, saveActionHandler: @escaping () -> Void) {
-        let alertController = UIAlertController.customTextFieldAlert { playlistName in
-
-            if let name = playlistName {
-                let newPlaylist = PlaylistModel(name: name, image: UIImage(imageLiteralResourceName: "noImagePlaylist"), songs: [])
-                myPlaylists.wrappedValue.append(newPlaylist)
-            }
-            
-
-        } saveAction: {
-            saveActionHandler()
+    func alertAddPlaylist(realmManager: RealmManager, completion: @escaping () -> Void) {
+        let alertController = UIAlertController(title: "Enter a new playlist name", message: "", preferredStyle: .alert)
+        alertController.addTextField { textField in
+            textField.placeholder = "Playlist Name"
         }
+        
+        let saveAction = UIAlertAction(title: "Save", style: .default) { _ in
+            guard let name = alertController.textFields?.first?.text, !name.isEmpty else { return }
+            
+            let newPlaylist = Playlist()
+            newPlaylist.name = name
+            realmManager.addPlaylist(newPlaylist)
+            
+            completion()
+        }
+        
+        let cancelAction = UIAlertAction(title: "Cancel", style: .cancel)
+        
+        alertController.addAction(saveAction)
+        alertController.addAction(cancelAction)
         
         if let viewController = UIApplication.shared.windows.first?.rootViewController {
             viewController.present(alertController, animated: true, completion: nil)
         }
     }
 }
-
 

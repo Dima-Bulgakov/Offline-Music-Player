@@ -7,42 +7,53 @@
 
 import SwiftUI
 
+
 struct AllMusicSearchBar: View {
     
     // MARK: - Properties
     @EnvironmentObject var vm: ViewModel
+    @State private var isFocused: Bool = false
+    
     let magnifyingglass = Image(systemName: "magnifyingglass")
     
     // MARK: - Body
     var body: some View {
         HStack {
             HStack {
+                Image(systemName: "magnifyingglass")
+                    .font(.subheadline)
+                    .foregroundColor(.white)
                 
-                /// Text Field
-                TextField("\(magnifyingglass) Search", text: $vm.searchAllMusic)
-                .multilineTextAlignment(.center)
-                .accentColor(.accent)
-                .colorMultiply(.white)
-                .padding(8)
-                .onChange(of: vm.searchAllMusic) { _ in
-                    vm.searchSongsByArtist()
-                }
+                /// TextField
+                TextField("Search", text: $vm.searchAllMusic)
+                    .multilineTextAlignment(.leading)
+                    .accentColor(.white)
+                    .foregroundColor(.white)
+                    .padding(8)
             }
-            
-            /// Shape
+            .padding(.leading)
+            .frame(height: 36)
+            .background(Color.accent.opacity(0.2))
+            .cornerRadius(10)
             .overlay(
                 RoundedRectangle(cornerRadius: 10)
-                    .stroke(Color.accent, lineWidth: 1)
+                    .stroke(isFocused ? Color.accent : Color.clear, lineWidth: 1)
             )
-            .frame(minHeight: 36, maxHeight: 36)
         }
         .padding(.horizontal)
         .padding(.top)
+        .onTapGesture {
+            self.isFocused = true
+        }
     }
 }
 
+
+// MARK: - Preview
 #Preview {
     AllMusicSearchBar()
-        .environmentObject(ViewModel())
+        .environmentObject(ViewModel(realmManager: RealmManager(name: "realm")))
+        .environmentObject(RealmManager(name: "viewModel"))
+        .environmentObject(ImportManager())
         .preferredColorScheme(.dark)
 }

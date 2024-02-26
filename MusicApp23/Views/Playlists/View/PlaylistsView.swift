@@ -6,8 +6,10 @@
 //
 
 import SwiftUI
+import RealmSwift
 
-// MARK: - Enum Buttons
+
+// MARK: - Enum Playlists Buttons
 enum PlaylistsAndFavoritesTab: String, CaseIterable, Identifiable {
     case myPlaylists = "My Playlists"
     case favorites = "Favorites"
@@ -16,34 +18,35 @@ enum PlaylistsAndFavoritesTab: String, CaseIterable, Identifiable {
 }
 
 /// All Cases Enums Buttons
-var sampleTabs: [PlaylistsAndFavoritesTab] = PlaylistsAndFavoritesTab.allCases
+var allCasesPlaylistTabs: [PlaylistsAndFavoritesTab] = PlaylistsAndFavoritesTab.allCases
 
 
-// MARK: - Main View
 struct PlaylistsView: View {
     
-    // MARK: Properties
-    @State var offset: CGFloat = 0
-    @State var currentTab: PlaylistsAndFavoritesTab = sampleTabs.first!
-    @State var isTapped: Bool = false
+    // MARK: - Properties
     @EnvironmentObject var vm: ViewModel
+    @EnvironmentObject var rm: RealmManager
+    
+    @State var offset: CGFloat = 0
+    @State var currentTab: PlaylistsAndFavoritesTab = allCasesPlaylistTabs.first!
+    @State var isTapped: Bool = false
+    
     @StateObject var gestureManager: GestureManager = .init()
     
-    // MARK: Body
+    // MARK: - Body
     var body: some View {
         VStack {
             GeometryReader { proxy in
                 let screenSize = proxy.size
-                
                 VStack {
                     
-                    // MARK: My Playlists And Favorite Buttons
+                    // MARK: "My Playlists" And "Favorite" Buttons
                     DynamicTabHeader(size: screenSize)
                     
                     // MARK: TabView
                     TabView(selection: $currentTab) {
-                        ForEach(sampleTabs) { tab in
-                            if tab == sampleTabs[0] {
+                        ForEach(allCasesPlaylistTabs) { tab in
+                            if tab == allCasesPlaylistTabs[0] {
                                 MyPlaylists()
                                     .offsetX { value in
                                         if currentTab == tab && !isTapped {
@@ -57,7 +60,6 @@ struct PlaylistsView: View {
                                         }
                                     }
                                     .tag(tab)
-                                
                             } else {
                                 Favorites()
                                     .offsetX { value in
@@ -87,46 +89,49 @@ struct PlaylistsView: View {
             .padding(.bottom, vm.isEditModeFavoriteShow || vm.isEditModePlaylistsShow ? 0 : 140)
             .ignoresSafeArea(.keyboard)
         }
+        .onChange(of: currentTab) { newTab in
+            switch newTab {
+            case .myPlaylists:
+                vm.isEditModeFavoriteShow = false
+                vm.unselectAllSongs()
+                vm.unselectAllPlaylists()
+            case .favorites:
+                vm.isEditModePlaylistsShow = false
+                vm.unselectAllSongs()
+                vm.unselectAllPlaylists()
+            }
+        }
         
-        
-        // MARK: - NavigationBar
+        // MARK: - Navigation Bar
         .customNavigationTitle(title: "Playlists")
         .customBarButton(name: vm.isEditModeFavoriteShow || vm.isEditModePlaylistsShow ? "done" : "edit", width: 32, height: 16, placement: .topBarTrailing) {
-            
             switch currentTab {
             case .myPlaylists:
-                if !vm.allPlaylists.isEmpty {
-                    vm.isEditModePlaylistsShow.toggle()
-                    vm.isPlayerPresented.toggle()
-                }
-                vm.isEditModeFavoriteShow = false
+                vm.isEditModePlaylistsShow.toggle()
+                vm.isPlayerPresented.toggle()
             case .favorites:
-                if !vm.favoriteSongs.isEmpty {
-                    vm.isEditModeFavoriteShow.toggle()
-                    vm.isPlayerPresented.toggle()
-                }
-                vm.isEditModePlaylistsShow = false
-                if !vm.isEditModeFavoriteShow {
-                    vm.unselectSongs()
-                }
+                vm.isEditModeFavoriteShow.toggle()
+                vm.isPlayerPresented.toggle()
             }
             vm.isMenuVisible = false
         }
         
         /// Button To Create New Playlist
         .customBarButton(name: "add", width: 25, height: 17, placement: .topBarTrailing) {
-            alertAddPlaylist(myPlaylists: $vm.allPlaylists) {
-                vm.isEditModePlaylistsShow = false
-                vm.isEditModeFavoriteShow = false
-                vm.isPlayerPresented = true
+            vm.isEditModePlaylistsShow = false
+            vm.isEditModeFavoriteShow = false
+            vm.isPlayerPresented = true
+            vm.isMenuVisible = false
+            vm.unselectAllSongs()
+            vm.unselectAllPlaylists()
+            alertAddPlaylist(realmManager: self.rm) {
                 vm.isShowAddToPlaylistView = true
-                vm.isMenuVisible = false
             }
         }
         
+        /// AddToPlaylistView Sheet
         NavigationLink(destination: AddToPlaylistView().onDisappear {
-            vm.unselectSongs()
-            vm.isShowAddToPlaylistView = false 
+            vm.isShowAddToPlaylistView = false
         },isActive: $vm.isShowAddToPlaylistView) {
             EmptyView()
         }
@@ -161,9 +166,9 @@ struct PlaylistsView: View {
                                         .foregroundColor(Color.accent)
                                         .containerShape(Capsule())
                                         .onTapGesture {
-                                            // MARK: Disabling The TabScrollOffset Detection
+                                            /// Disabling The TabScrollOffset Detection
                                             isTapped = true
-                                            // MARK: Updating Tab
+                                            /// Updating Tab
                                             withAnimation(.easeInOut) {
                                                 currentTab = tab
                                                 offset = -(size.width) * CGFloat(indexOf(tab: tab))
@@ -175,7 +180,7 @@ struct PlaylistsView: View {
                         }
                         .frame(width: size.width - 30)
                     })
-                    .frame(width: (size.width - 30) / CGFloat(sampleTabs.count))
+                    .frame(width: (size.width - 30) / CGFloat(allCasesPlaylistTabs.count))
                     .mask({
                         Capsule()
                     })
@@ -193,24 +198,24 @@ struct PlaylistsView: View {
     
     // MARK: Tab Offset
     func tabOffser(size: CGSize, padding: CGFloat) -> CGFloat {
-        return (-offset / size.width) * ((size.width - padding) / CGFloat(sampleTabs.count))
+        return (-offset / size.width) * ((size.width - padding) / CGFloat(allCasesPlaylistTabs.count))
     }
     
     // MARK: Tab Index
     func indexOf(tab: PlaylistsAndFavoritesTab) -> Int {
-        let index = sampleTabs.firstIndex { CTab in
+        let index = allCasesPlaylistTabs.firstIndex { CTab in
             CTab == tab
         } ?? 0
-        
         return index
     }
 }
 
 
+// MARK: - Preview
 #Preview {
-    NavigationView {
-        PlaylistsView()
-            .environmentObject(ViewModel())
-            .preferredColorScheme(.dark)
-    }
+    PlaylistsView()
+        .environmentObject(ViewModel(realmManager: RealmManager(name: "realm")))
+        .environmentObject(RealmManager(name: "viewModel"))
+        .environmentObject(ImportManager())
+        .preferredColorScheme(.dark)
 }

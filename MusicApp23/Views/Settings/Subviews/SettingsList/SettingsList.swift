@@ -7,6 +7,7 @@
 
 import SwiftUI
 
+
 struct SettingsList: View {
     
     // MARK: - Model For Cell
@@ -18,7 +19,6 @@ struct SettingsList: View {
     }
     
     // MARK: - Property
-    
     /// Array With Settings Cells
     var settingsArray: [SettingItem] {
         [
@@ -42,7 +42,7 @@ struct SettingsList: View {
     
     /// Email Properties
     @Environment(\.openURL) var openURL
-    private var email = SupportEmail(toAddress: "voio@gmail.com",
+    private var email = SupportEmail(toAddress: "meloman.offline@pm.me",
                                      subject: "Support Email",
                                      messageHeader: "Please describe your issue below")
     /// Share Properties
@@ -71,7 +71,7 @@ struct SettingsList: View {
 }
 
 
+// MARK: - Preview
 #Preview {
     SettingsList()
-        .preferredColorScheme(.dark)
 }

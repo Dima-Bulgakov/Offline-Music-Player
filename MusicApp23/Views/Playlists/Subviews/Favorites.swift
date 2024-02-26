@@ -6,62 +6,61 @@
 //
 
 import SwiftUI
+import RealmSwift
+
 
 struct Favorites: View {
     
     // MARK: - Properties
     @EnvironmentObject var vm: ViewModel
+    @EnvironmentObject var rm: RealmManager
+    @ObservedResults(Playlist.self, filter: NSPredicate(format: "name == 'Favorite'")) var playlists
     
     // MARK: - Body
     var body: some View {
         VStack {
+            
+            // MARK: List Of Favorite Playlist
             List {
-                ForEach(vm.favoriteSongs) { song in
-                    if vm.isEditModeFavoriteShow {
-                        SongCellWithDurationAndEditMode(songModel: song) {
-                            vm.isSelectedSongInArrays(model: song, playlist: &vm.favoriteSongs)
-                        }
-                    } else {
-                        SongCellWithDuration(songModel: song)
-                            .onTapGesture {
-                                vm.playAudio(data: song.data, playlist: vm.favoriteSongs)
-                                vm.setCurrentSong(song, index: vm.favoriteSongs.firstIndex(of: song))
+                if let favoritePlaylist = playlists.first {
+                    ForEach(favoritePlaylist.songs) { song in
+                        if vm.isEditModeFavoriteShow {
+                            SongCellWithDurationAndEditMode(songModel: song) {
+                                vm.selectSong(songId: song.id)
                             }
+                        } else {
+                            SongCellWithDuration(songModel: song)
+                                .onTapGesture {
+                                    vm.playAudio(data: song.data, playlist: Array(favoritePlaylist.songs))
+                                    vm.setCurrentSong(song, index: favoritePlaylist.songs.firstIndex(of: song))
+                                }
+                        }
                     }
+                    .onDelete(perform: deleteSongs)
+                    .listRowSeparator(.hidden)
+                    .listRowBackground(Color.bg)
                 }
-                .listRowSeparator(.hidden)
-                .listRowBackground(Color.bg)
             }
             .listStyle(PlainListStyle())
-
-            // MARK: Bottom Buttons
+            
+            // MARK: Buttons For Edit Mode
             if vm.isEditModeFavoriteShow {
                 HStack {
-                    
-                    /// Select All Button
                     ButtonForEditMode(name: "selectAll", width: 100) {
-                        vm.selectAllSongs()
+                        vm.selectAllCells(for: .favorites)
                     }
                     Spacer()
                     
-                    /// Add To Button
                     ButtonForEditMode(name: "addTo", width: 80) {
                         vm.isShowChoosePlaylistView = true
-                        vm.selectedSongs = vm.favoriteSongs.filter { $0.isSelected }
                     }
-                    
-                    /// Sheet Choose Playlists For "Add To" Button
                     .sheet(isPresented: $vm.isShowChoosePlaylistView) {
                         ChoosePlaylistView()
-                            .onDisappear {
-                                vm.resetPlaylistSelection()
-                            }
                     }
                     Spacer()
                     
-                    /// Delete Button
                     ButtonForEditMode(name: "delete", width: 75) {
-                        vm.deleteSelectedSongsFromFavorites()
+                        vm.deleteSelectedFavorites()
                     }
                 }
                 .padding(.horizontal, 25)
@@ -69,12 +68,23 @@ struct Favorites: View {
             }
         }
     }
+    
+    // MARK: - Methods
+    func deleteSongs(at offsets: IndexSet) {
+        guard let favoritePlaylist = playlists.first else { return }
+        offsets.forEach { index in
+            let songId = favoritePlaylist.songs[index].id
+            rm.removeSongFromFavorite(songId: songId)
+        }
+    }
 }
 
+
+// MARK: - Preview
 #Preview {
-    NavigationView {
-        PlaylistsView()
-            .environmentObject(ViewModel())
-            .preferredColorScheme(.dark)
-    }
+    Favorites()
+        .environmentObject(ViewModel(realmManager: RealmManager(name: "realm")))
+        .environmentObject(RealmManager(name: "viewModel"))
+        .environmentObject(ImportManager())
+        .preferredColorScheme(.dark)
 }

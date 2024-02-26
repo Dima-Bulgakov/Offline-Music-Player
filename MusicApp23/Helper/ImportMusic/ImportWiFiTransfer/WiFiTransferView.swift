@@ -11,16 +11,17 @@ import RealmSwift
 import AVFoundation
 
 
-// MARK: - Wi-fi Transfer Importing Music
+// MARK: - Importing Music Through Wifi Transfer
 struct WiFiTransferView: View {
     
     // MARK: - Properties
+    @EnvironmentObject var rm: RealmManager
+    @Environment (\.dismiss) private var dismiss
+    
     @State private var webServer: GCDWebServer?
     @State private var serverURL: String = ""
-    @EnvironmentObject var vm: ViewModel
-    @EnvironmentObject var importManager: VMImportManager
-    @Environment (\.dismiss) private var dismiss
     @State private var netService: NetService?
+    @State var serverIPAddress: String?
     
     // MARK: - Body
     var body: some View {
@@ -41,7 +42,7 @@ struct WiFiTransferView: View {
                 .padding(.bottom, 20)
             
         }
-        .background(Color.bunner)
+        .background(Color.bg)
         .onDisappear {
             stopServer()
         }
@@ -69,69 +70,85 @@ struct WiFiTransferView: View {
             })
             
             /// POST Request Handler
-            webServer?.addHandler(forMethod: "POST", path: "/", request: GCDWebServerMultiPartFormRequest.self, processBlock: { request in
-                if let files = (request as? GCDWebServerMultiPartFormRequest)?.files {
+            webServer?.addHandler(forMethod: "POST", path: "/", request: GCDWebServerMultiPartFormRequest.self, asyncProcessBlock: { request, completionBlock in
+                guard let multiPartRequest = request as? GCDWebServerMultiPartFormRequest else {
+                    completionBlock(GCDWebServerDataResponse(statusCode: 400))
+                    return
+                }
+                
+                let files = multiPartRequest.files as! [GCDWebServerMultiPartFile]
+                var savedSongs: [Song] = []
+                
+                do {
+                    let realmConfiguration = self.rm.appGroupRealmConfiguration()
+                    let realm = try Realm(configuration: realmConfiguration)
                     
                     for file in files {
-                        let uniqueFileName = "song_\(Date().timeIntervalSince1970).mp3"
-                        let fileURL = documentsURL.appendingPathComponent(uniqueFileName)
+                        let fileURL = try self.moveFileToDocumentDirectory(file: file)
+                        let asset = AVURLAsset(url: fileURL)
                         
-                        do {
-                            /// Copy The Temporary File To The Document Directory
-                            try FileManager.default.copyItem(atPath: file.temporaryPath, toPath: fileURL.path)
-                            
-                            /// Get Song Metadata
-                            let trackName = self.getMetadata(from: fileURL, key: .commonKeyTitle) as? String ?? "Unknown Track"
-                            let artist = self.getMetadata(from: fileURL, key: .commonKeyArtist) as? String ?? "Unknown Artist"
-                            let coverData = self.getMetadata(from: fileURL, key: .commonKeyArtwork) as? Data
-                            let asset = AVURLAsset(url: fileURL)
-                            let duration = asset.duration.seconds
-                            
-                            /// Convert The File Path To Data
-                            if let fileData = FileManager.default.contents(atPath: fileURL.path) {
-                                /// Save Song Metadata To Realm
-                                DispatchQueue.main.async {
-                                    vm.addSong(name: trackName, data: fileData, artist: artist, coverImageData: coverData, duration: duration)
-                                }
+                        let trackName = self.getMetadata(from: asset, key: .commonKeyTitle) as? String ?? "Unknown Track"
+                        let artist = self.getMetadata(from: asset, key: .commonKeyArtist) as? String ?? "Unknown Artist"
+                        let coverData = self.getMetadata(from: asset, key: .commonKeyArtwork) as? Data
+                        let duration = asset.duration.seconds
+                        
+                        if let fileData = FileManager.default.contents(atPath: fileURL.path) {
+                            // Проверка на существование песни
+                            let existingSong = realm.objects(Song.self).filter("name == %@ AND artist == %@ AND duration == %@", trackName, artist, duration).first
+                            if existingSong == nil {
+                                let newSong = Song(name: trackName, data: fileData, artist: artist, coverImageData: coverData, duration: duration)
+                                savedSongs.append(newSong)
                             } else {
-                                print("Failed to convert file to Data.")
-                                return GCDWebServerDataResponse(statusCode: 500)
+                                print("Song already exists and won't be added again: \(trackName)")
                             }
-                        } catch {
-                            print("Failed to save song:", error)
-                            return GCDWebServerDataResponse(statusCode: 500)
+                        } else {
+                            print("Failed to convert file to Data.")
+                            continue
                         }
                     }
-                    
-                    return GCDWebServerDataResponse(html: HTMLPage.successMessage)
-                } else {
-                    return GCDWebServerDataResponse(html: HTMLPage.errorMessage)
+                } catch {
+                    print("Error initializing Realm or processing files: \(error)")
+                    completionBlock(GCDWebServerDataResponse(statusCode: 500))
+                    return
+                }
+                
+                /// Save All Songs To Realm After Processing All Files
+                DispatchQueue.main.async {
+                    do {
+                        let realm = try Realm(configuration: self.rm.appGroupRealmConfiguration())
+                        try realm.write {
+                            for song in savedSongs {
+                                realm.add(song)
+                            }
+                        }
+                        completionBlock(GCDWebServerDataResponse(html: HTMLPage.successMessage))
+                    } catch {
+                        print("Error saving songs to Realm:", error)
+                        completionBlock(GCDWebServerDataResponse(statusCode: 500))
+                    }
                 }
             })
             
             /// Start The Server
             try webServer?.start(options: [GCDWebServerOption_Port: 8081, GCDWebServerOption_BindToLocalhost: false])
-                    if let serverURL = webServer?.serverURL?.absoluteString {
-                        print("Local server running at \(serverURL)")
-                        DispatchQueue.main.async {
-                            // Обновляем serverURL на правильный IP-адрес
-                            self.serverURL = serverURL
-                        }
-                    } else {
-                        // Если webServer.serverURL недоступен, пытаемся использовать getWiFiAddress()
-                        if let ipAddress = self.getWiFiAddress() {
-                            let correctURL = "http://\(ipAddress):8081"
-                            DispatchQueue.main.async {
-                                self.serverURL = correctURL
-                                print("Fallback Server IP Address: \(ipAddress)")
-                            }
-                        }
-                    }
+            updateServerAddress()
             
         } catch let error {
             print("Ошибка при создании Realm или запуске сервера: \(error)")
         }
         
+    }
+    
+    private func updateServerAddress() {
+        DispatchQueue.main.async {
+            if let ipAddress = self.getWiFiAddress() {
+                self.serverURL = "http://\(ipAddress):8081"
+                print("Local server running at \(self.serverURL)")
+                self.serverIPAddress = ipAddress
+            } else {
+                print("Unable to retrieve Wi-Fi IP address")
+            }
+        }
     }
     
     // MARK: Method Stops The NetService To Stop Declaring The Service.
@@ -156,10 +173,8 @@ struct WiFiTransferView: View {
     }
     
     // MARK: Method For Extracting Song Metadata
-    private func getMetadata(from fileURL: URL, key: AVMetadataKey) -> Any? {
-        let asset = AVURLAsset(url: fileURL)
-        let metadata = asset.metadata(forFormat: .id3Metadata)
-        
+    private func getMetadata(from asset: AVURLAsset, key: AVMetadataKey) -> Any? {
+        let metadata = asset.commonMetadata
         return metadata.first { $0.commonKey == key }?.value
     }
     
@@ -168,32 +183,34 @@ struct WiFiTransferView: View {
         var address: String?
         var ifaddr: UnsafeMutablePointer<ifaddrs>?
         
-        /// Get The List Of Interfaces
-        guard getifaddrs(&ifaddr) == 0 else { return nil }
-        guard let firstAddr = ifaddr else { return nil }
-        
-        for ptr in sequence(first: firstAddr, next: { $0.pointee.ifa_next }) {
-            let flags = Int32(ptr.pointee.ifa_flags)
-            let addr = ptr.pointee.ifa_addr.pointee
-            
-            /// Verify That It Is A Wi-Fi Interface And Has An IP Address
-            if (flags & (IFF_UP | IFF_RUNNING | IFF_LOOPBACK)) == (IFF_UP | IFF_RUNNING),
-               addr.sa_family == UInt8(AF_INET) {
-                var hostname = [CChar](repeating: 0, count: Int(NI_MAXHOST))
-                if (getnameinfo(ptr.pointee.ifa_addr, socklen_t(addr.sa_len),
-                                &hostname, socklen_t(hostname.count),
-                                nil, socklen_t(0), NI_NUMERICHOST) == 0) {
-                    address = String(cString: hostname)
-                    break
+        if getifaddrs(&ifaddr) == 0 {
+            var ptr = ifaddr
+            while ptr != nil {
+                defer { ptr = ptr?.pointee.ifa_next }
+                
+                guard let interface = ptr?.pointee else { continue }
+                let addrFamily = interface.ifa_addr.pointee.sa_family
+                if addrFamily == UInt8(AF_INET), // Фильтр для IPv4
+                   interface.ifa_flags & UInt32(IFF_UP) != 0 {
+                    var hostname = [CChar](repeating: 0, count: Int(NI_MAXHOST))
+                    if getnameinfo(interface.ifa_addr, socklen_t(interface.ifa_addr.pointee.sa_len),
+                                   &hostname, socklen_t(hostname.count),
+                                   nil, socklen_t(0), NI_NUMERICHOST) == 0,
+                       let name = interface.ifa_name, String(cString: name) == "en0" {
+                        address = String(cString: hostname)
+                        break
+                    }
                 }
             }
+            freeifaddrs(ifaddr)
         }
-        freeifaddrs(ifaddr)
+        
         return address
     }
 }
 
 
+// MARK: - Preview
 #Preview {
     WiFiTransferView()
 }

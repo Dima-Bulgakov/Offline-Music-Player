@@ -7,6 +7,7 @@
 
 import SwiftUI
 
+
 struct DescriptionViewWiFiTransfer: View {
     
     // MARK: - Properties
@@ -35,7 +36,3 @@ struct DescriptionViewWiFiTransfer: View {
         }
     }
 }
-
-//#Preview {
-//    DescriptionViewWiFiTransfer()
-//}

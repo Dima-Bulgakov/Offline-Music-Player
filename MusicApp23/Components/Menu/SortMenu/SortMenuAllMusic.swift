@@ -7,6 +7,7 @@
 
 import SwiftUI
 
+
 struct SortMenuAllMusic: View {
     
     // MARK: - Properties
@@ -18,29 +19,29 @@ struct SortMenuAllMusic: View {
             
             // MARK: Sorting By Artist
             CustomeMenuButton(image: "artist", text: "Artist (A-z)") {
-                vm.sortSongsByArtist()
-                vm.isShowSortMenu = false
+                vm.currentSortAllSongs = .artist
+                vm.isShowSortMenuAllMusic = false
             }
             Divider()
             
             // MARK: Sorting By Title
             CustomeMenuButton(image: "title", text: "Title (A-z)") {
-                vm.sortSongsByTitle()
-                vm.isShowSortMenu = false
+                vm.currentSortAllSongs = .name
+                vm.isShowSortMenuAllMusic = false
             }
             Divider()
             
             // MARK: Sorting By Date
             CustomeMenuButton(image: "date", text: "Date") {
-                vm.sortSongsByDate()
-                vm.isShowSortMenu = false
+                vm.currentSortAllSongs = .date
+                vm.isShowSortMenuAllMusic = false
             }
             Divider()
             
             // MARK: Sorting By Duration
             CustomeMenuButton(image: "duration", text: "Duration") {
-                vm.sortSongsByDuration()
-                vm.isShowSortMenu = false
+                vm.currentSortAllSongs = .duration
+                vm.isShowSortMenuAllMusic = false
             }
         }
         .frame(width: 175, height: 168)
@@ -48,9 +49,3 @@ struct SortMenuAllMusic: View {
         .modifier(ConditionalCompactAdaptation())
     }
 }
-
-//#Preview {
-//    SortMenu()
-//        .environmentObject(ViewModel())
-//        .preferredColorScheme(.dark)
-//}

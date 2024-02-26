@@ -6,22 +6,27 @@
 //
 
 import SwiftUI
+import RealmSwift
+
 
 struct PlaylistView: View {
     
     // MARK: - Properties
-    var playlist: PlaylistModel
-    @Environment (\.dismiss) private var dismiss
-    @Environment(\.presentationMode) var presentationMode
     @EnvironmentObject var vm: ViewModel
+    @EnvironmentObject var rm: RealmManager
+    
+    @Environment(\.presentationMode) var presentationMode
+    @Environment (\.dismiss) private var dismiss
+    
+    @ObservedRealmObject var playlist: Playlist
     
     // MARK: - Body
     var body: some View {
         VStack {
             
             // MARK: - Subviews
-            Head(playlistModel: playlist)
-            SongsList(playlistModel: playlist)
+            Head(playlist: playlist)
+            SongsList(playlist: playlist)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
         .background(Color.bg)
@@ -29,37 +34,63 @@ struct PlaylistView: View {
         
         // MARK: - NavigationBar
         .customNavigationTitle(title: playlist.name)
-        .customBarButton(name: vm.isEditModeInPlaylistShow ? "done" : "edit", width: 32, height: 16, placement: .topBarTrailing) {
-            vm.isEditModeInPlaylistShow.toggle()
-            vm.isPlayerPresented.toggle()
+        
+        /// Increasing The Popularity Of The Playlist At The Entrance
+        .onAppear {
+            self.incrementNumberOfListens(for: self.playlist)
+            print("Playlist \(playlist.name): NunOfList: \(playlist.numberOfListens)")
         }
+        
+        /// Button To Create New Playlist
         .customBarButton(name: "add", width: 25, height: 17, placement: .topBarTrailing) {
-            alertAddPlaylist(myPlaylists: $vm.allPlaylists) {
-                vm.isEditModePlaylistsShow = false
-                vm.isEditModeFavoriteShow = false
-                vm.isEditModeInPlaylistShow = false
-                vm.isPlayerPresented = true
-                
+            alertAddPlaylist(realmManager: self.rm) {
                 vm.isShowAddToPlaylistView = true
             }
         }
+        
+        /// AddToPlaylistView Sheet
+        NavigationLink(destination: AddToPlaylistView().onDisappear {
+        },isActive: $vm.isShowAddToPlaylistView) {
+            EmptyView()
+        }
+        .hidden()
+        
+        /// Back Button
         .customBarButton(name: "back", width: 40, height: 14, placement: .topBarLeading) {
             dismiss()
             vm.isEditModeInPlaylistShow = false
             vm.isPlayerPresented = true
         }
+        
+        // MARK: - DragGesture
         .gesture(DragGesture().onEnded { value in
             if value.translation.width > 100 {
                 presentationMode.wrappedValue.dismiss()
             }
         })
     }
+    
+    // MARK: - Methods
+    /// Method To Increase Playlist Popularity
+    private func incrementNumberOfListens(for playlist: Playlist) {
+        guard let realm = try? Realm(configuration: rm.appGroupRealmConfiguration()) else { return }
+        do {
+            try realm.write {
+                guard let updatingPlaylist = realm.object(ofType: Playlist.self, forPrimaryKey: playlist.id) else { return }
+                updatingPlaylist.numberOfListens += 1
+            }
+        } catch {
+            print("Ошибка при увеличении количества прослушиваний: \(error)")
+        }
+    }
 }
 
+
+// MARK: - Preview
 #Preview {
-    NavigationView {
-        PlaylistView(playlist: PlaylistModel(name: "Workout", image: UIImage(imageLiteralResourceName: "playlist5"), songs: []))
-            .environmentObject(ViewModel())
-            .preferredColorScheme(.dark)
-    }
+    PlaylistView(playlist: Playlist(name: ""))
+        .environmentObject(ViewModel(realmManager: RealmManager(name: "realm")))
+        .environmentObject(RealmManager(name: "viewModel"))
+        .environmentObject(ImportManager())
+        .preferredColorScheme(.dark)
 }

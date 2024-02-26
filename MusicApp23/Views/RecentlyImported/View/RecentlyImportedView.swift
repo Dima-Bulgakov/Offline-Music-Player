@@ -7,6 +7,7 @@
 
 import SwiftUI
 
+
 struct RecentlyImportedView: View {
     
     // MARK: - Properties
@@ -19,7 +20,7 @@ struct RecentlyImportedView: View {
             VStack {
                 
                 // MARK: - Subviews
-                RecentlySearchBar()
+                RecentlyMusicSearchBar()
                 
                 HStack(spacing: 16) {
                     ShuffleButton()
@@ -28,7 +29,7 @@ struct RecentlyImportedView: View {
                 .padding(.top, 14)
                 .padding(.horizontal)
                 
-                RecentlyList()
+                RecentlyImportedList()
                     .padding()
             }
             .background(Color.bg)
@@ -40,9 +41,12 @@ struct RecentlyImportedView: View {
                 vm.searchRecently = ""
                 dismiss()
             }
-            .customBarButton(name: "twoArrow", width: 25, height: 21, placement: .topBarTrailing) {
+            
+            /// Reverse Button
+            .customBarButton(name: "reverse", width: 25, height: 21, placement: .topBarTrailing) {
                 vm.searchRecently = ""
-                vm.reverseOrder()
+                vm.currentSortRecently = .reverse
+                vm.isReverseRecentlyMusicEnable.toggle()
             }
         }
         .padding(.bottom, 130)
@@ -50,10 +54,14 @@ struct RecentlyImportedView: View {
     }
 }
 
+
+// MARK: - Preview
 #Preview {
     NavigationView {
         RecentlyImportedView()
-            .environmentObject(ViewModel())
-        .preferredColorScheme(.dark)
+            .environmentObject(ViewModel(realmManager: RealmManager(name: "realm")))
+            .environmentObject(RealmManager(name: "viewModel"))
+            .environmentObject(ImportManager())
+            .preferredColorScheme(.dark)
     }
 }

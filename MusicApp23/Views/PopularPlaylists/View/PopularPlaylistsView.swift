@@ -7,6 +7,7 @@
 
 import SwiftUI
 
+
 struct PopularPlaylistsView: View {
     
     // MARK: - Properties
@@ -27,10 +28,4 @@ struct PopularPlaylistsView: View {
             .padding(.bottom, 140)
         }
     }
-}
-
-#Preview {
-    PopularPlaylistsView()
-        .environmentObject(ViewModel())
-        .preferredColorScheme(.dark)
 }

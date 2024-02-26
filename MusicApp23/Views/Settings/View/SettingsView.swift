@@ -7,6 +7,7 @@
 
 import SwiftUI
 
+
 struct SettingsView: View {
         
     // MARK: - Body
@@ -27,14 +28,17 @@ struct SettingsView: View {
             .background(Color.bg)
             }
         }
-        // MARK: - NavigationBar
+        // MARK: - Navigation Bar
         .customNavigationTitle(title: "Settings")
     }
 }
 
+
+// MARK: - Preview
 #Preview {
-    NavigationView {
-        SettingsView()
-            .preferredColorScheme(.dark)
-    }
+    SettingsView()
+        .environmentObject(ViewModel(realmManager: RealmManager(name: "realm")))
+        .environmentObject(RealmManager(name: "viewModel"))
+        .environmentObject(ImportManager())
+        .preferredColorScheme(.dark)
 }

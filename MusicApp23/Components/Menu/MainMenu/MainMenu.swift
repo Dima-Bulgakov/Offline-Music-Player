@@ -7,17 +7,18 @@
 
 import SwiftUI
 
+
 struct MainMenu: View {
     
     // MARK: - Properties
-    @State private var selectedView: Int = 1
     @EnvironmentObject var vm: ViewModel
     
     // MARK: - Body
     var body: some View {
         NavigationView {
             VStack {
-                switch selectedView {
+                
+                switch vm.selectedView {
                 case 1:
                     MusicPlayerView()
                         .blur(radius: vm.isMenuVisible ? 1.5 : 0)
@@ -53,6 +54,7 @@ struct MainMenu: View {
                             .resizable()
                             .scaledToFit()
                             .frame(width: 25)
+                            .foregroundColor(Color.accent)
                     }
                 }
             }
@@ -61,7 +63,7 @@ struct MainMenu: View {
                     if vm.isMenuVisible {
                         GeometryReader { _ in
                             withAnimation {
-                                MainMenuView(selectedView: $selectedView)
+                                MainMenuView()
                                     .offset(x: 20)
                             }
                         }
@@ -83,9 +85,11 @@ struct MainMenu: View {
 }
 
 
+// MARK: - Preview
 #Preview {
     ContentView()
-        .environmentObject(ViewModel())
-        .environmentObject(VMImportManager())
+        .environmentObject(ViewModel(realmManager: RealmManager(name: "realm")))
+        .environmentObject(RealmManager(name: "viewModel"))
+        .environmentObject(ImportManager())
         .preferredColorScheme(.dark)
 }

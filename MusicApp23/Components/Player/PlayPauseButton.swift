@@ -7,6 +7,7 @@
 
 import SwiftUI
 
+
 struct PlayPauseButton: View {
     
     // MARK: - Properties
@@ -36,6 +37,7 @@ struct PlayPauseButton: View {
             }
             .disabled(isButtonDisabled)
         }
+        
         /// Turn Off The Button When Song Unselected
         .onReceive(vm.$currentSong) { currentSong in
             isButtonDisabled = currentSong == nil
@@ -43,8 +45,8 @@ struct PlayPauseButton: View {
     }
 }
 
+
+// MARK: - Preview
 #Preview {
     PlayPauseButton()
-        .environmentObject(ViewModel())
-        .preferredColorScheme(.dark)
 }

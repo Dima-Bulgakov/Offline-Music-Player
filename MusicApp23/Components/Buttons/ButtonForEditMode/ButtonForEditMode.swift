@@ -7,12 +7,15 @@
 
 import SwiftUI
 
+
 struct ButtonForEditMode: View {
     
+    // MARK: - Properties
     let name: String
     let width: CGFloat
     let action: () -> ()
     
+    // MARK: - Body
     var body: some View {
         Button {
             action()
@@ -26,6 +29,8 @@ struct ButtonForEditMode: View {
     }
 }
 
+
+// MARK: - Preview
 #Preview {
     ButtonForEditMode(name: "delete", width: 75, action: {})
         .preferredColorScheme(.dark)

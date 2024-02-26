@@ -7,13 +7,14 @@
 
 import SwiftUI
 
+
 struct RoundedCorners: Shape {
     
-    // MARK: Properties
+    // MARK: - Properties
     var cornerRadius: CGFloat
     var corners: UIRectCorner
     
-    // MARK: Methods
+    // MARK: - Methods
     func path(in rect: CGRect) -> Path {
         var path = Path()
         

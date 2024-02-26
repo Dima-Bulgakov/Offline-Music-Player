@@ -6,11 +6,14 @@
 //
 
 import SwiftUI
+import RealmSwift
+
 
 struct MyMusicView: View {
     
     // MARK: - Properties
     @EnvironmentObject var vm: ViewModel
+    @EnvironmentObject var rm: RealmManager
     @Environment(\.presentationMode) var presentationMode
     
     // MARK: - Body
@@ -37,30 +40,35 @@ struct MyMusicView: View {
             .background(Color.bg)
         }
         
-        // MARK: - NavigationBar
+        // MARK: - Navigation Bar
         .customNavigationTitle(title: "My Music")
+        
+        /// Edit Button
         .customBarButton(name: vm.isEditModeAllMusicShow ? "done" : "edit", width: 32, height: 16, placement: .topBarTrailing) {
-            if !vm.allSongs.isEmpty {
+            vm.searchAllMusic = ""
+            if let songs = rm.songs, !songs.isEmpty {
                 vm.isEditModeAllMusicShow.toggle()
                 vm.isPlayerPresented.toggle()
-                if !vm.isEditModeAllMusicShow {
-                    vm.unselectSongs()
-                }
+                vm.unselectAllSongs()
             }
             vm.isMenuVisible = false
-            vm.searchAllMusic = ""
         }
+        
+        /// Reverse Button
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
                 if !vm.isEditModeAllMusicShow {
-                    ButtonForEditMode(name: "twoArrow", width: 20) {
-                        vm.reverseOrder()
+                    ButtonForEditMode(name: "reverse", width: 20) {
+                        vm.currentSortAllSongs = .reverse
+                        vm.isReverseAllMusicEnable.toggle()
                         vm.searchAllMusic = ""
                         vm.isMenuVisible = false
                     }
                 }
             }
         }
+        
+        // MARK: - DragGesture
         .gesture(DragGesture().onEnded { value in
             if value.translation.width > 100 {
                 presentationMode.wrappedValue.dismiss()
@@ -70,10 +78,13 @@ struct MyMusicView: View {
 }
 
 
+// MARK: - Preview
 #Preview {
     NavigationView {
         MyMusicView()
-            .environmentObject(ViewModel())
+            .environmentObject(ViewModel(realmManager: RealmManager(name: "realm")))
+            .environmentObject(RealmManager(name: "viewModel"))
+            .environmentObject(ImportManager())
             .preferredColorScheme(.dark)
     }
 }

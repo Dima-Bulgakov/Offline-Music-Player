@@ -6,29 +6,27 @@
 //
 
 import SwiftUI
+import RealmSwift
+
 
 struct AddFavorites: View {
     
     // MARK: - Properties
     @EnvironmentObject var vm: ViewModel
+    @ObservedResults(Playlist.self, filter: NSPredicate(format: "name == 'Favorite'")) var playlists
     
     // MARK: - Body
     var body: some View {
         List {
-            ForEach(vm.favoriteSongs) { song in
-                AddMusicItem(songModel: song) {
-                    vm.isSelectedSongInArrays(model: song, playlist: &vm.favoriteSongs)
+            if let favoritePlaylist = playlists.first  {
+                ForEach(favoritePlaylist.songs) { song in
+                    SongCellWithDurationAndEditMode(songModel: song) {
+                        vm.selectSong(songId: song.id)
+                    }
                 }
+                .listRowSeparator(.hidden)
             }
-            .listRowSeparator(.hidden)
         }
         .listStyle(PlainListStyle())
     }
 }
-
-#Preview {
-    AddFavorites()
-        .environmentObject(ViewModel())
-        .preferredColorScheme(.dark)
-}
-

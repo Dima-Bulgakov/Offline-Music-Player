@@ -7,6 +7,7 @@
 
 import SwiftUI
 
+
 struct CustomPlayerButton: View {
     
     // MARK: - Properties
@@ -28,6 +29,8 @@ struct CustomPlayerButton: View {
     }
 }
 
+
+// MARK: - Preview
 #Preview {
     CustomPlayerButton(image: "pause", size: 24, color: Color.white, action: {})
         .preferredColorScheme(.dark)

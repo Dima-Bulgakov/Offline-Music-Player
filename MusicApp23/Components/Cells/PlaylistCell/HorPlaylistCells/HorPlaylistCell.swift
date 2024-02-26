@@ -6,38 +6,43 @@
 //
 
 import SwiftUI
+import RealmSwift
 
 struct HorPlaylistCell: View {
     
     // MARK: - Properties
-    let playlistModel: PlaylistModel
+    @EnvironmentObject var rm: RealmManager
+    @ObservedRealmObject var playlist: Playlist
     
     // MARK: - Body
     var body: some View {
         HStack(spacing: 14) {
             
             // MARK: Image
-            Image(uiImage: playlistModel.image)
-                .resizable()
-                .scaledToFill()
-                .frame(width: 85, height: 85)
-                .cornerRadius(10)
+            if let coverImageData = playlist.image, let uiImage = UIImage(data: coverImageData) {
+                Image(uiImage: uiImage)
+                    .resizable()
+                    .scaledToFill()
+                    .frame(width: 85, height: 85)
+                    .cornerRadius(10)
+            } else {
+                Image("noImagePlaylist")
+                    .resizable()
+                    .scaledToFill()
+                    .frame(width: 85, height: 85)
+                    .cornerRadius(10)
+            }
             
             // MARK: Description
             VStack(alignment: .leading) {
-                Text(playlistModel.name)
+                Text(playlist.name)
                     .nameFont()
                     .foregroundStyle(Color.white)
-                Text("\(playlistModel.count) Songs")
+                Text("\(playlist.count) Songs")
                     .font(.system(size: 14))
                     .descriptionFont()
             }
             Spacer()
         }
     }
-}
-
-#Preview {
-    HorPlaylistCell(playlistModel: PlaylistModel(name: "For Car", image: UIImage(imageLiteralResourceName: "testPlaylistImage"), songs: []))
-        .preferredColorScheme(.dark)
 }

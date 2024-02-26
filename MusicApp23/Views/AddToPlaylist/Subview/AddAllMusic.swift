@@ -6,18 +6,21 @@
 //
 
 import SwiftUI
+import RealmSwift
+
 
 struct AddAllMusic: View {
     
     // MARK: - Properties
     @EnvironmentObject var vm: ViewModel
+    @ObservedResults(Song.self) var allSongs
     
     // MARK: - Body
     var body: some View {
         List {
-            ForEach(vm.allSongs) { song in
-                AddMusicItem(songModel: song) {
-                    vm.isSelectedSongInArrays(model: song, playlist: &vm.allSongs)
+            ForEach(allSongs) { song in
+                SongCellWithDurationAndEditMode(songModel: song) {
+                    vm.selectSong(songId: song.id)
                 }
             }
             .listRowSeparator(.hidden)
@@ -26,8 +29,3 @@ struct AddAllMusic: View {
     }
 }
 
-#Preview {
-    AddAllMusic()
-        .environmentObject(ViewModel())
-        .preferredColorScheme(.dark)
-}

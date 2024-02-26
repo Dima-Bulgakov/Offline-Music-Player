@@ -8,6 +8,7 @@
 import SwiftUI
 import UIKit
 
+
 struct ImagePickerForChangeImage: UIViewControllerRepresentable {
     
     // MARK: - Properties
@@ -16,7 +17,7 @@ struct ImagePickerForChangeImage: UIViewControllerRepresentable {
     var onImageSelected: (UIImage) -> Void
     
     // MARK: - Class Coordinator
-    class Coordinator: NSObject, UIImagePickerControllerDelegate, UINavigationControllerDelegate {
+    final class Coordinator: NSObject, UIImagePickerControllerDelegate, UINavigationControllerDelegate {
         
         // MARK: Properties
         var parent: ImagePickerForChangeImage

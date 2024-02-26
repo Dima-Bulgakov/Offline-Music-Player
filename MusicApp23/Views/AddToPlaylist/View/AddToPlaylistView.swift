@@ -7,6 +7,7 @@
 
 import SwiftUI
 
+
 // MARK: - Enum Buttons
 enum AllMusicAndFavoritesTab: String, CaseIterable, Identifiable {
     case allMusic = "All Music"
@@ -19,12 +20,14 @@ enum AllMusicAndFavoritesTab: String, CaseIterable, Identifiable {
 var addToPlaylistTab: [AllMusicAndFavoritesTab] = AllMusicAndFavoritesTab.allCases
 
 
-// MARK: - Main View
 struct AddToPlaylistView: View {
     
     // MARK: Properties
     @EnvironmentObject var vm: ViewModel
+    @EnvironmentObject var rm: RealmManager
+    
     @Environment (\.dismiss) private var dismiss
+    
     @StateObject var gestureManager: GestureManager = .init()
     
     @State var offset: CGFloat = 0
@@ -39,7 +42,7 @@ struct AddToPlaylistView: View {
                 
                 VStack {
                     
-                    // MARK: My Playlists And Favorite Buttons
+                    // MARK: "All Music" And "Favorite" Buttons
                     DynamicTabHeader(size: screenSize)
                     
                     // MARK: TabView
@@ -86,33 +89,17 @@ struct AddToPlaylistView: View {
             }
             .background(Color.bg)
             
-            // MARK: - Botton Buttons
+            // MARK: - Botton Buttons For Edit
             HStack {
-                Button {
-                    vm.selectAllSongs()
-                } label: {
-                    Image("selectAll")
-                        .resizable()
-                        .scaledToFit()
-                        .frame(width: 100)
-                        .foregroundColor(Color.accent)
+                ButtonForEditMode(name: "selectAll", width: 100) {
+                    vm.selectAllCells(for: .songs)
                 }
                 Spacer()
-                Button {
+                ButtonForEditMode(name: "addTo", width: 80) {
                     vm.isShowChoosePlaylistView = true
-                    vm.selectedSongs = vm.allSongs.filter { $0.isSelected }
-                } label: {
-                    Image("addTo")
-                        .resizable()
-                        .scaledToFit()
-                        .frame(width: 80)
-                        .foregroundColor(Color.accent)
                 }
                 .sheet(isPresented: $vm.isShowChoosePlaylistView) {
                     ChoosePlaylistView()
-                        .onDisappear {
-                            vm.resetPlaylistSelection()
-                        }
                 }
             }
             .padding(.horizontal)
@@ -120,7 +107,7 @@ struct AddToPlaylistView: View {
             .background(Color.bg)
         }
         
-        // MARK: - NavigationBar
+        // MARK: - Navigation Bar
         .navigationBarBackButtonHidden(true)
         .customNavigationTitle(title: "Add To Playlist")
         .customBarButton(name: "cancel", width: 32, height: 16, placement: .topBarLeading) {
@@ -156,9 +143,9 @@ struct AddToPlaylistView: View {
                                         .foregroundColor(Color.accent)
                                         .containerShape(Capsule())
                                         .onTapGesture {
-                                            // MARK: Disabling The TabScrollOffset Detection
+                                            /// Disabling The TabScrollOffset Detection
                                             isTapped = true
-                                            // MARK: Updating Tab
+                                            /// Updating Tab
                                             withAnimation(.easeInOut) {
                                                 currentTab = tab
                                                 offset = -(size.width) * CGFloat(indexOf(tab: tab))
@@ -170,7 +157,7 @@ struct AddToPlaylistView: View {
                         }
                         .frame(width: size.width - 30)
                     })
-                    .frame(width: (size.width - 30) / CGFloat(sampleTabs.count))
+                    .frame(width: (size.width - 30) / CGFloat(allCasesPlaylistTabs.count))
                     .mask({
                         Capsule()
                     })
@@ -188,7 +175,7 @@ struct AddToPlaylistView: View {
     
     // MARK: Tab Offset
     func tabOffser(size: CGSize, padding: CGFloat) -> CGFloat {
-        return (-offset / size.width) * ((size.width - padding) / CGFloat(sampleTabs.count))
+        return (-offset / size.width) * ((size.width - padding) / CGFloat(allCasesPlaylistTabs.count))
     }
     
     // MARK: Tab Index
@@ -202,10 +189,13 @@ struct AddToPlaylistView: View {
 }
 
 
+// MARK: - Preview
 #Preview {
     NavigationView {
-        AddToPlaylistView()
-            .environmentObject(ViewModel())
+        PlaylistsView()
+            .environmentObject(ViewModel(realmManager: RealmManager(name: "realm")))
+            .environmentObject(RealmManager(name: "viewModel"))
+            .environmentObject(ImportManager())
             .preferredColorScheme(.dark)
     }
 }

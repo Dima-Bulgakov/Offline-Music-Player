@@ -7,6 +7,7 @@
 
 import SwiftUI
 
+
 struct SongMenu: View {
     
     // MARK: - Properties
@@ -18,28 +19,27 @@ struct SongMenu: View {
             
             /// Add To Favorite Button
             CustomeMenuButton(image: "favoriteSM", text: "Add to Favorite") {
-                vm.addToFavorites()
-                vm.isShowSongMenu = false
+                vm.addCurrentSongToFavorites()
             }
             Divider()
             
             /// Add To Playlist Button
             CustomeMenuButton(image: "playlistSM", text: "Add to Playlist") {
-                vm.isShowChoosePlaylistView = true
-                vm.isShowSongMenu = false
+                vm.addCurrentSongToPlaylists()
             }
+            
+            /// ChoosePlaylistView Sheet
             .sheet(isPresented: $vm.isShowChoosePlaylistView) {
                 ChoosePlaylistView()
                     .onDisappear {
-                        vm.resetPlaylistSelection()
+                        
                     }
             }
             Divider()
             
             /// Delete Button
             CustomeMenuButton(image: "deleteSM", text: "Delete") {
-                /// Add Action
-                vm.isShowSongMenu = false
+                vm.deleteCurrentSong()
             }
         }
         .frame(width: 175, height: 143)
@@ -47,6 +47,7 @@ struct SongMenu: View {
         .modifier(ConditionalCompactAdaptation())
     }
 }
+
 
 struct ConditionalCompactAdaptation: ViewModifier {
     
@@ -61,11 +62,4 @@ struct ConditionalCompactAdaptation: ViewModifier {
             return content
         }
     }
-}
-
-
-#Preview {
-    SongMenu()
-        .environmentObject(ViewModel())
-        .preferredColorScheme(.dark)
 }

@@ -7,6 +7,7 @@
 
 import SwiftUI
 
+
 struct SettingListCell: View {
     
     // MARK: - Properties
@@ -49,9 +50,4 @@ struct SettingListCell: View {
             action()
         }
     }
-}
-
-#Preview {
-    SettingListCell(image: "report", title: "Report Bug", action: {})
-        .preferredColorScheme(.dark)
 }

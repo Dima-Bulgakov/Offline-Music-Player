@@ -7,6 +7,7 @@
 
 import SwiftUI
 
+
 struct OpenConnectionButtonWiFiTransfer: View {
     
     // MARK: - Properties
@@ -21,18 +22,13 @@ struct OpenConnectionButtonWiFiTransfer: View {
             HStack {
                 Text("Open Connection")
                     .shuffleAndSortFont()
-                    .padding(.vertical, 15)
+                    .padding(.vertical, 20)
                     .frame(maxWidth: .infinity)
                     .background(Color.accent.opacity(0.2))
-                    .cornerRadius(30)
+                    .cornerRadius(10)
             }
         }
         .frame(maxWidth: .infinity)
         .padding(.horizontal)
     }
-}
-
-#Preview {
-    OpenConnectionButtonWiFiTransfer(serverURL: .constant("")) {}
-        .preferredColorScheme(.dark)
 }

@@ -7,6 +7,7 @@
 
 import SwiftUI
 
+
 struct PlayerView: View {
     
     // MARK: - Properties
@@ -37,6 +38,7 @@ struct PlayerView: View {
                     
                 }
             }
+            .accentColor(Color.accent)
             .zIndex(1)
             .onAppear {
                 Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { _ in
@@ -46,7 +48,7 @@ struct PlayerView: View {
             
             VStack(spacing: 10) {
                 
-                // MARK: - Menu
+                // MARK: - Song Menu
                 Button {
                     if let currentSong = vm.currentSong {
                         vm.isShowSongMenu.toggle()
@@ -81,8 +83,8 @@ struct PlayerView: View {
                 // MARK: Player Buttons
                 HStack {
                     Spacer()
-                    CustomPlayerButton(image: "repeat", size: 18, color: vm.isRepeat ? Color.gray : Color.primaryFont) {
-                        vm.toggleRepeat()
+                    CustomPlayerButton(image: "repeat", size: 18, color: vm.isRepeatModeEnabled ? Color.white.opacity(0.5) : Color.white) {
+                        vm.repeatSong()
                         vm.isMenuVisible = false
                     }
                     Spacer()
@@ -98,8 +100,8 @@ struct PlayerView: View {
                         vm.isMenuVisible = false
                     }
                     Spacer()
-                    CustomPlayerButton(image: "shuffle", size: 18, color: vm.isShuffle ? Color.gray : Color.primaryFont) {
-                        vm.shuffleSongs()
+                    CustomPlayerButton(image: "shuffle", size: 18, color: vm.isShuffleModeEnabled ? Color.white.opacity(0.5) : Color.white) {
+                        vm.isShuffleModeEnabled.toggle()
                         vm.isMenuVisible = false
                     }
                     Spacer()
@@ -118,12 +120,14 @@ struct PlayerView: View {
     }
 }
 
+
+// MARK: - Preview
 #Preview {
     ZStack {
         Color.white
         ContentView()
-            .environmentObject(ViewModel())
-            .environmentObject(VMImportManager())
+            .environmentObject(ViewModel(realmManager: RealmManager(name: "realm")))
+            .environmentObject(RealmManager(name: "viewModel"))
             .preferredColorScheme(.dark)
     }
 }

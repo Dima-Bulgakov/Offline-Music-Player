@@ -7,14 +7,15 @@
 
 import SwiftUI
 
+
 struct MenuItem: View {
     
-    // MARK: Properties
+    // MARK: - Properties
     let image: String
     let title: String
     let isSelected: Bool
     
-    // MARK: Body
+    // MARK: - Body
     var body: some View {
         VStack {
             HStack {
@@ -30,6 +31,8 @@ struct MenuItem: View {
     }
 }
 
+
+// MARK: - Preview
 #Preview {
     MenuItem(image: "home", title: "Home", isSelected: true)
         .frame(height: 22)

@@ -6,12 +6,16 @@
 //
 
 import SwiftUI
+import RealmSwift
+
 
 struct VerPlaylistCell: View {
     
     // MARK: - Properties
-    let playlistModel: PlaylistModel
     @EnvironmentObject var vm: ViewModel
+    @EnvironmentObject var rm: RealmManager
+    
+    @ObservedRealmObject var playlist: Playlist
     
     // MARK: - Body
     var body: some View {
@@ -19,42 +23,49 @@ struct VerPlaylistCell: View {
             ZStack {
                 
                 // MARK: Background Image
-                Image(uiImage: playlistModel.image)
-                    .resizable()
-                    .scaledToFill()
-                    .frame(width: 140, height: 100)
-                    .blur(radius: 3.0, opaque: true)
-                    .cornerRadius(10)
+                if let coverImageData = playlist.image, let uiImage = UIImage(data: coverImageData) {
+                    Image(uiImage: uiImage)
+                        .resizable()
+                        .scaledToFill()
+                        .frame(width: 140, height: 100)
+                        .blur(radius: 3.0, opaque: true)
+                        .cornerRadius(10)
+                } else {
+                    Image("noImagePlaylist")
+                        .resizable()
+                        .scaledToFill()
+                        .frame(width: 140, height: 100)
+                        .blur(radius: 3.0, opaque: true)
+                        .cornerRadius(10)
+                }
                 
                 // MARK: Main Image
-                Image(uiImage: playlistModel.image)
-                    .resizable()
-                    .scaledToFill()
-                    .frame(width: 80, height: 80, alignment: /*@START_MENU_TOKEN@*/.center/*@END_MENU_TOKEN@*/)
-                    .cornerRadius(10)
+                if let coverImageData = playlist.image, let uiImage = UIImage(data: coverImageData) {
+                    Image(uiImage: uiImage)
+                        .resizable()
+                        .scaledToFill()
+                        .frame(width: 80, height: 80, alignment: /*@START_MENU_TOKEN@*/.center/*@END_MENU_TOKEN@*/)
+                        .cornerRadius(10)
+                } else {
+                    Image("noImagePlaylist")
+                        .resizable()
+                        .scaledToFill()
+                        .frame(width: 80, height: 80, alignment: /*@START_MENU_TOKEN@*/.center/*@END_MENU_TOKEN@*/)
+                        .cornerRadius(10)
+                }
             }
             .padding(.bottom, 3)
             
             // MARK: Album Name
-            Text(playlistModel.name)
+            Text(playlist.name)
                 .nameFont()
                 .foregroundStyle(Color.primaryFont)
             
             // MARK: Songs Count
-            Text("\(playlistModel.count) Songs")
+            Text("\(playlist.count) Songs")
                 .descriptionFont()
                 .foregroundStyle(Color.secondaryFont)
         }
-        .onAppear {
-            vm.playlistListens(playlist: playlistModel)
-            print("Number of Listens for \(playlistModel.name): \(playlistModel.numberOfListens)")
-        }
         .listRowBackground(Color.bg)
     }
-}
-
-
-#Preview {
-    VerPlaylistCell(playlistModel: PlaylistModel(name: "Workout", image: UIImage(imageLiteralResourceName: "playlist3"), songs: []))
-        .preferredColorScheme(.dark)
 }

@@ -7,10 +7,11 @@
 
 import SwiftUI
 
+
 struct SongCell: View {
     
     // MARK: - Properties
-    let songModel: SongModel
+    let songModel: Song
     
     // MARK: - Body
     var body: some View {
@@ -55,9 +56,12 @@ struct SongCell: View {
     }
 }
 
+
+// MARK: - Preview
 #Preview {
-    SongCell(songModel: SongModel())
-        .environmentObject(ViewModel())
+    SongCell(songModel: Song())
+        .environmentObject(ViewModel(realmManager: RealmManager(name: "realm")))
+        .environmentObject(RealmManager(name: "viewModel"))
+        .environmentObject(ImportManager())
         .preferredColorScheme(.dark)
 }
-

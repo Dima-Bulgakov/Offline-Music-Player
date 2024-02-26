@@ -11,8 +11,9 @@ import SwiftUI
 struct SongCellWithDurationAndEditMode: View {
     
     // MARK: - Properties
-    let songModel: SongModel
     @EnvironmentObject var vm: ViewModel
+    
+    let songModel: Song
     let toggleCompletion: () -> Void
     
     // MARK: - Body
@@ -20,10 +21,11 @@ struct SongCellWithDurationAndEditMode: View {
         HStack(spacing: 14) {
             
             // MARK: Toggle
-            Image(songModel.isSelected ? "select" : "unselect")
+            Image(systemName: vm.selectedSongs.contains(songModel.id) ? "circle.inset.filled" : "circle")
                 .resizable()
                 .scaledToFit()
                 .frame(width: 20, height: 20)
+                .foregroundColor(Color.accent)
             
             // MARK: Image
             if let coverImageData = songModel.coverImageData, let uiImage = UIImage(data: coverImageData) {
@@ -74,8 +76,10 @@ struct SongCellWithDurationAndEditMode: View {
     }
 }
 
+
+// MARK: - Preview
 #Preview {
-    SongCellWithDurationAndEditMode(songModel: SongModel(), toggleCompletion: {})
-        .environmentObject(ViewModel())
+    SongCellWithDurationAndEditMode(songModel: Song(), toggleCompletion: {})
+        .environmentObject(ViewModel(realmManager: RealmManager(name: "realm")))
         .preferredColorScheme(.dark)
 }

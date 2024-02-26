@@ -7,37 +7,37 @@
 
 import SwiftUI
 
+
 struct MainMenuView: View {
     
-    // MARK: Properties
-    @Binding var selectedView: Int
+    // MARK: - Properties
     @EnvironmentObject var vm: ViewModel
     
-    // MARK: Body
+    // MARK: - Body
     var body: some View {
         GeometryReader { geometry in
             VStack(alignment: .leading) {
-                MenuItem(image: "home", title: "Home", isSelected: selectedView == 1)
+                MenuItem(image: "home", title: "Home", isSelected: vm.selectedView == 1)
                     .onTapGesture {
-                        selectedView = 1
+                        vm.selectedView = 1
                         vm.isMenuVisible.toggle()
                     }
                 Divider()
-                MenuItem(image: "myMusic", title: "My Music", isSelected: selectedView == 2)
+                MenuItem(image: "myMusic", title: "My Music", isSelected: vm.selectedView == 2)
                     .onTapGesture {
-                        selectedView = 2
+                        vm.selectedView = 2
                         vm.isMenuVisible.toggle()
                     }
                 Divider()
-                MenuItem(image: "playlists", title: "Playlists", isSelected: selectedView == 3)
+                MenuItem(image: "playlists", title: "Playlists", isSelected: vm.selectedView == 3)
                     .onTapGesture {
-                        selectedView = 3
+                        vm.selectedView = 3
                         vm.isMenuVisible.toggle()
                     }
                 Divider()
-                MenuItem(image: "settings", title: "Settings", isSelected: selectedView == 4)
+                MenuItem(image: "settings", title: "Settings", isSelected: vm.selectedView == 4)
                     .onTapGesture {
-                        selectedView = 4
+                        vm.selectedView = 4
                         vm.isMenuVisible.toggle()
                     }
             }
@@ -49,10 +49,4 @@ struct MainMenuView: View {
             )
         }
     }
-}
-
-#Preview {
-    MainMenuView(selectedView: .constant(1))
-        .environmentObject(ViewModel())
-        .preferredColorScheme(.dark)
 }

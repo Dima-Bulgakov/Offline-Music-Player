@@ -6,62 +6,63 @@
 //
 
 import SwiftUI
+import RealmSwift
+
 
 struct MusicList: View {
     
     // MARK: - Properties
     @EnvironmentObject var vm: ViewModel
+    @EnvironmentObject var rm: RealmManager
+    @ObservedResults(Song.self) var allSongs
     
     // MARK: - Body
     var body: some View {
         VStack {
             
-            // MARK: List Of All Songs
+            // MARK: - List Of All Songs
             List {
-                ForEach(vm.filteredSongs) { song in
+                ForEach(sortedAllSongs().filter({ song in
+                    vm.searchAllMusic.isEmpty || song.artist?.localizedCaseInsensitiveContains(vm.searchAllMusic) ?? false
+                })) { song in
                     if vm.isEditModeAllMusicShow {
                         SongCellWithDurationAndEditMode(songModel: song) {
-                            vm.isSelectedSongInArrays(model: song, playlist: &vm.allSongs)
+                            vm.selectSong(songId: song.id)
                         }
                         .listRowBackground(Color.bg)
                     } else {
                         SongCellWithDuration(songModel: song)
                             .onTapGesture {
-                                vm.playAudio(data: song.data, playlist: vm.allSongs)
-                                vm.setCurrentSong(song, index: vm.allSongs.firstIndex(of: song))
+                                vm.playAudio(data: song.data, playlist: Array(sortedAllSongs()))
+                                vm.setCurrentSong(song, index: sortedAllSongs().firstIndex(of: song))
                             }
                             .listRowBackground(Color.bg)
                     }
-                    
                 }
-                .onDelete(perform: vm.deleteSong)
+                .onDelete(perform: $allSongs.remove)
                 .listRowSeparator(.hidden)
             }
             .listStyle(.plain)
             .padding(.bottom, vm.isEditModeAllMusicShow ? 0 : 140)
             .ignoresSafeArea(.keyboard)
             
-            
-            // MARK: Bottom Buttons For Edit Mode
+            // MARK: - Bottom Buttons For Edit Mode
             if vm.isEditModeAllMusicShow  {
                 HStack {
                     ButtonForEditMode(name: "selectAll", width: 100) {
-                        vm.selectAllSongs()
+                        vm.selectAllCells(for: .songs)
                     }
                     Spacer()
                     ButtonForEditMode(name: "addTo", width: 80) {
                         vm.isShowChoosePlaylistView = true
-                        vm.selectedSongs = vm.allSongs.filter { $0.isSelected }
                     }
                     .sheet(isPresented: $vm.isShowChoosePlaylistView) {
                         ChoosePlaylistView()
-                            .onDisappear {
-                                vm.resetPlaylistSelection()
-                            }
                     }
                     Spacer()
                     ButtonForEditMode(name: "delete", width: 75) {
-                        
+                        vm.deleteSelectedSongs()
+                        vm.isEditModeAllMusicShow = false
                     }
                 }
                 .padding(.horizontal, 25)
@@ -69,11 +70,31 @@ struct MusicList: View {
             }
         }
     }
+    
+    // MARK: - Methods
+    private func sortedAllSongs() -> [Song] {
+        let songsArray = Array(allSongs)
+        switch vm.currentSortAllSongs {
+        case .name:
+            return songsArray.sorted(by: { $0.name < $1.name })
+        case .artist:
+            return songsArray.sorted(by: { ($0.artist ?? "") < ($1.artist ?? "") })
+        case .duration:
+            return songsArray.sorted(by: { ($0.duration ?? 0) < ($1.duration ?? 0) })
+        case .date:
+            return songsArray
+        case .reverse:
+            return vm.isReverseAllMusicEnable ? songsArray.reversed() : songsArray
+        }
+    }
 }
 
 
+// MARK: - Preview
 #Preview {
     MusicList()
-        .environmentObject(ViewModel())
+        .environmentObject(ViewModel(realmManager: RealmManager(name: "realm")))
+        .environmentObject(RealmManager(name: "viewModel"))
+        .environmentObject(ImportManager())
         .preferredColorScheme(.dark)
 }
