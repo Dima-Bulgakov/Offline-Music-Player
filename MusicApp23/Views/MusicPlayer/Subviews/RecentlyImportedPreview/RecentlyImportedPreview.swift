@@ -42,7 +42,7 @@ struct RecentlyImportedPreview: View {
             ScrollView(.horizontal, showsIndicators: false) {
                 
                 LazyHGrid(rows: numberColumns, spacing: 20) {
-                    ForEach(songs.prefix(16)) { song in
+                    ForEach(songs.reversed().prefix(16)) { song in
 
                         SongCell(songModel: song)
                             .onTapGesture {

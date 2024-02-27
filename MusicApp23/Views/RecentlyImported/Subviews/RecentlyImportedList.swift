@@ -39,7 +39,7 @@ struct RecentlyImportedList: View {
     
     // MARK: - Methods
     private func sortedRecentlySongs() -> [Song] {
-        let songsArray = Array(allSongs.prefix(16))
+        let songsArray = Array(allSongs.reversed().prefix(16))
         switch vm.currentSortRecently {
         case .name:
             return songsArray.sorted(by: { $0.name < $1.name })
