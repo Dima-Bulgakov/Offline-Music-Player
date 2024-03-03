@@ -18,7 +18,8 @@ Importantly, it supports five different methods to upload your music, ensuring y
   - Share extension import
   - Wi-fi Transfer import
   - Safari import instruction
-    
+
+- Save to Realm Data Base
 ## Screenshots
 <!--
 -->
@@ -27,9 +28,7 @@ Importantly, it supports five different methods to upload your music, ensuring y
 ![TaskFlowBoard](https://github.com/Dima-Bulgakov/Offline-Music-Player/blob/b3e9f898a07929b12369fa2274d9fc932a16f9a1/CoverMusicPlayer.png)
 
 ## Video
-<img src="https://github.com/Dima-Bulgakov/Pet-Project-Aldebaran/assets/111886499/2f046092-9656-4ebf-aafe-a27547d81fa2" width="200">
-
-
+https://github.com/Dima-Bulgakov/Offline-Music-Player/issues/1#issue-2165319250
 ## Tools
 
 [![MIT License](https://img.shields.io/badge/-Swift-orange)](https://developer.apple.com/swift/)
