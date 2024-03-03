@@ -20,6 +20,7 @@ Importantly, it supports five different methods to upload your music, ensuring y
   - Safari import instruction
 
 - Save to Realm Data Base
+  
 ## Screenshots
 <!--
 -->
@@ -28,7 +29,12 @@ Importantly, it supports five different methods to upload your music, ensuring y
 ![TaskFlowBoard](https://github.com/Dima-Bulgakov/Offline-Music-Player/blob/b3e9f898a07929b12369fa2274d9fc932a16f9a1/CoverMusicPlayer.png)
 
 ## Video
-https://github.com/Dima-Bulgakov/Offline-Music-Player/issues/1#issue-2165319250
+https://github.com/Dima-Bulgakov/Offline-Music-Player/assets/111886499/3adaac49-7047-42a2-b3e4-b0c1cf67becf
+
+https://github.com/Dima-Bulgakov/Offline-Music-Player/assets/111886499/0ec34224-31a0-4a62-aed4-256b37b4f254
+
+https://github.com/Dima-Bulgakov/Offline-Music-Player/assets/111886499/c4f0a418-669b-4f15-9ee8-b3323acb7a41
+
 ## Tools
 
 [![MIT License](https://img.shields.io/badge/-Swift-orange)](https://developer.apple.com/swift/)
