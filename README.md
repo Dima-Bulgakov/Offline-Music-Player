@@ -6,31 +6,25 @@ Importantly, it supports five different methods to upload your music, ensuring y
 
 ## Major Functionality
 
-- 5 ways to upload your music
+- Download and and listen to music in different formats
 
 - Create personalized playlists
-
+ 
 - Customize your playlists, change the cover or the title.
-
-- Dark and light mode
-
-
-## Future Functionality
-
-- Add the other art partners
-
-- Create database in firebase
-
-- Add a new page of art news from our partners and their new projects
-
-- Add a new page to apply to become an Aldebaran partner
-
+ 
+- 5 ways to upload your music
+  - Files import
+  - Camera import (convert video to music)
+  - Share extension import
+  - Wi-fi Transfer import
+  - Safari import instruction
+    
 ## Screenshots
 <!--
 -->
 </p>
 
-![TaskFlowBoard](https://github.com/Dima-Bulgakov/Pet-Project-Aldebaran/blob/2a0b65616aeafbf3f8f0943821684d59751ed293/screens.png)
+![TaskFlowBoard](https://github.com/Dima-Bulgakov/Offline-Music-Player/blob/b3e9f898a07929b12369fa2274d9fc932a16f9a1/CoverMusicPlayer.png)
 
 ## Video
 <img src="https://github.com/Dima-Bulgakov/Pet-Project-Aldebaran/assets/111886499/2f046092-9656-4ebf-aafe-a27547d81fa2" width="200">
