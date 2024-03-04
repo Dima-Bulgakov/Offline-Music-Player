@@ -21,6 +21,10 @@ Importantly, it supports five different methods to upload your music, ensuring y
 
 - Save to Realm Data Base
   
+- MVVM
+  
+- Realm
+  
 ## Screenshots
 <!--
 -->
